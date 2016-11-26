@@ -1,9 +1,13 @@
 package net.evlikat.siberian.model;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -11,12 +15,15 @@ import static net.evlikat.siberian.model.Cell.SIZE;
 
 public class Field implements Visibility {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(Field.class);
+
+    private long turn = 0;
+
     private final int width;
     private final int height;
 
     private final List<Cell> cells;
-    private final List<LivingUnit> units = new ArrayList<>();
-    private final List<LivingUnit> justDeadUnits = new ArrayList<>();
+    private List<LivingUnit> units = new ArrayList<>();
     private final List<LivingUnit> justBornUnits = new ArrayList<>();
 
     private Field(int width, int height, List<Cell> cells) {
@@ -33,13 +40,13 @@ public class Field implements Visibility {
     }
 
     public void update() {
+        turn++;
         new ArrayList<>(units).forEach((drawableUnit) -> {
             // TODO: consider 'sight'
             drawableUnit.update(this);
         });
-        units.removeAll(justDeadUnits);
-        justDeadUnits.clear();
-        units.addAll(justBornUnits);
+        units = Stream.concat(units.stream().filter(LivingUnit::isAlive), justBornUnits.stream())
+                .collect(Collectors.toList());
         justBornUnits.clear();
     }
 
@@ -77,7 +84,6 @@ public class Field implements Visibility {
     }
 
     public void addUnit(LivingUnit livingUnit) {
-        livingUnit.addDeathListener(justDeadUnits::add);
         livingUnit.addBirthListener(justBornUnits::add);
         units.add(livingUnit);
     }

@@ -12,6 +12,7 @@ public class Rabbit extends LivingUnit implements DrawableUnit {
 
     public static final double DIVISION_RATE = 0.1d;
     public static final int SIZE = 10;
+    public static final int FOOD_VALUE = 20;
     public static final Color BORDER = Color.PINK;
 
     public Rabbit(Position position) {

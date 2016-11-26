@@ -13,4 +13,17 @@ public class NumberGauge extends Gauge<Integer> {
     public float part() {
         return getCurrent().floatValue() / getMax().floatValue();
     }
+
+    public void inc() {
+        setCurrent(getCurrent() + 1);
+    }
+
+    public void dec() {
+        setCurrent(getCurrent() - 1);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d/%d", getCurrent(), getMax());
+    }
 }

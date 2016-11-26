@@ -1,18 +1,23 @@
 package net.evlikat.siberian.model;
 
 import net.evlikat.siberian.model.stats.NumberGauge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class LivingUnit implements DrawableUnit {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(LivingUnit.class);
+
+    private boolean alive = true;
+
     private final int sight;
     protected final NumberGauge health = new NumberGauge(0, 100);
+    protected final NumberGauge age = new NumberGauge(0, 0, 1000);
     private final List<Consumer<LivingUnit>> birthListeners = new LinkedList<>();
-    private final List<Consumer<LivingUnit>> deathListeners = new LinkedList<>();
     private final List<Class<? extends LivingUnit>> canEat;
 
     private Position position;
@@ -32,23 +37,36 @@ public abstract class LivingUnit implements DrawableUnit {
     }
 
     public final void update() {
+        if (!alive) {
+            return;
+        }
+        age.inc();
         updateGauges();
-        if (Objects.equals(health.getCurrent(), health.getMin())) {
+        if (dead()) {
             kill();
         }
+    }
+
+    private boolean dead() {
+        return health.atMin() || age.atMax();
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 
     public void birth(LivingUnit livingUnit) {
         birthListeners.forEach(bl -> bl.accept(livingUnit));
     }
 
-    public void kill() {
-        deathListeners.forEach(listener -> listener.accept(this));
-        deathListeners.clear();
-    }
-
-    public void addDeathListener(Consumer<LivingUnit> listener) {
-        deathListeners.add(listener);
+    public boolean kill() {
+        if (alive) {
+            LOGGER.debug("A {} died on {}", getClass().getSimpleName(), getPosition());
+            alive = false;
+            birthListeners.clear();
+            return true;
+        }
+        return false;
     }
 
     public void addBirthListener(Consumer<LivingUnit> listener) {

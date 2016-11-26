@@ -36,4 +36,12 @@ public class Gauge<T extends Comparable<T>> {
     public T getMax() {
         return max;
     }
+
+    public boolean atMax() {
+        return getCurrent().compareTo(getMax()) == 0;
+    }
+
+    public boolean atMin() {
+        return getCurrent().compareTo(getMin()) == 0;
+    }
 }
