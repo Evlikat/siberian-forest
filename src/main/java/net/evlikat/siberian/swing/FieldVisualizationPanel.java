@@ -35,7 +35,7 @@ public class FieldVisualizationPanel extends JPanel {
             }
         }, 0, 100);
 
-        IntStream.range(0, 50).forEach(i -> {
+        IntStream.range(0, 100).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
             field.addUnit(new Rabbit(Position.on(randX, randY)));

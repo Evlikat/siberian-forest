@@ -45,8 +45,8 @@ public class Field implements Visibility {
             // TODO: consider 'sight'
             drawableUnit.update(this);
         });
-        units = Stream.concat(units.stream().filter(LivingUnit::isAlive), justBornUnits.stream())
-                .collect(Collectors.toList());
+        units = units.stream().filter(LivingUnit::isAlive).collect(Collectors.toCollection(ArrayList::new));
+        justBornUnits.forEach(this::addUnit);
         justBornUnits.clear();
     }
 
