@@ -1,20 +1,23 @@
 package net.evlikat.siberian.model;
 
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static net.evlikat.siberian.model.Cell.SIZE;
 
-public class Field {
+public class Field implements Visibility {
 
     private final int width;
     private final int height;
 
     private final List<Cell> cells;
-    private final List<DrawableUnit> units = new ArrayList<>();
+    private final List<LivingUnit> units = new ArrayList<>();
+    private final List<LivingUnit> justDeadUnits = new ArrayList<>();
+    private final List<LivingUnit> justBornUnits = new ArrayList<>();
 
     private Field(int width, int height, List<Cell> cells) {
         this.width = width;
@@ -30,12 +33,19 @@ public class Field {
     }
 
     public void update() {
-        units.forEach(DrawableUnit::update);
+        new ArrayList<>(units).forEach((drawableUnit) -> {
+            // TODO: consider 'sight'
+            drawableUnit.update(this);
+        });
+        units.removeAll(justDeadUnits);
+        justDeadUnits.clear();
+        units.addAll(justBornUnits);
+        justBornUnits.clear();
     }
 
     public void draw(Graphics2D g) {
         cells.forEach(cell -> cell.draw(g));
-        units.forEach(unit ->
+        new ArrayList<>(units).forEach(unit ->
                 unit.draw((Graphics2D) g.create(
                         unit.getPosition().getX() * SIZE,
                         unit.getPosition().getY() * SIZE,
@@ -53,6 +63,11 @@ public class Field {
         return height;
     }
 
+    @Override
+    public Stream<LivingUnit> units() {
+        return units.stream();
+    }
+
     public Cell get(int x, int y) {
         return cells.get(y * width + x);
     }
@@ -61,7 +76,9 @@ public class Field {
         return cells.set(y * width + x, new Cell(x, y));
     }
 
-    public void addUnit(DrawableUnit drawableUnit) {
-        units.add(drawableUnit);
+    public void addUnit(LivingUnit livingUnit) {
+        livingUnit.addDeathListener(justDeadUnits::add);
+        livingUnit.addBirthListener(justBornUnits::add);
+        units.add(livingUnit);
     }
 }

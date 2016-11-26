@@ -34,7 +34,7 @@ public class Position {
     }
 
     public boolean adjustableIn(int minX, int minY, int maxX, int maxY) {
-        return x > maxX || x < minX || y > maxY || y < minY;
+        return x >= maxX || x < minX || y >= maxY || y < minY;
     }
 
     @Override

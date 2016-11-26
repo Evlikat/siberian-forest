@@ -27,7 +27,7 @@ public class Cell implements DrawableUnit {
     }
 
     @Override
-    public void update() {
+    public void update(Visibility visibility) {
         // nothing changes
     }
 
