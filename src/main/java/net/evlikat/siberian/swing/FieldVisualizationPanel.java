@@ -28,6 +28,7 @@ public class FieldVisualizationPanel extends JPanel {
     public static final int HEIGHT = CONF.getInt("height");
     //
     private Field field;
+    private volatile Timer timer;
 
     public FieldVisualizationPanel() {
         super(true);
@@ -36,13 +37,7 @@ public class FieldVisualizationPanel extends JPanel {
 
     public void init() {
         field = Field.create(WIDTH, HEIGHT);
-        new Timer(false).scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                updateGame();
-            }
-        }, 0, 100);
-
+        start();
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
@@ -53,6 +48,25 @@ public class FieldVisualizationPanel extends JPanel {
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
             field.addUnit(new RegularWolf(Position.on(randX, randY), Sex.random()));
         });
+    }
+
+    public void stopOrResume() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        } else {
+            start();
+        }
+    }
+
+    private void start() {
+        timer = new Timer(false);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                updateGame();
+            }
+        }, 0, 100);
     }
 
     @Override
