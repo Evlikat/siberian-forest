@@ -51,7 +51,7 @@ public class RegularWolf extends Wolf {
                     .map(Pair::getKey)
                     .map(target -> getPosition().inDirectionTo(target))
                     .orElseGet(() ->
-                            availableDirections.get(ThreadLocalRandom.current().nextInt(availableDirections.size() - 1))));
+                            availableDirections.get(ThreadLocalRandom.current().nextInt(availableDirections.size()))));
         } else {
             return Optional.of(visibility.units()
                     .map(InterestUnit::new)
@@ -62,7 +62,7 @@ public class RegularWolf extends Wolf {
                     .map(Pair::getKey)
                     .map(target -> getPosition().inDirectionTo(target))
                     .orElseGet(() ->
-                            availableDirections.get(ThreadLocalRandom.current().nextInt(availableDirections.size() - 1))));
+                            availableDirections.get(ThreadLocalRandom.current().nextInt(availableDirections.size()))));
         }
     }
 

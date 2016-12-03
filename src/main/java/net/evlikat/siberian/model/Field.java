@@ -4,9 +4,11 @@ package net.evlikat.siberian.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -51,20 +53,33 @@ public class Field {
         unit.update(new WorldVisibility(
                 getWidth(),
                 getHeight(),
-                units().filter(u -> u.getPosition().distance(unit.getPosition()) <= unit.getSight())
+                units()
+                        .filter(u -> u != unit)
+                        .filter(u -> u.getPosition().distance(unit.getPosition()) <= unit.getSight())
                         .collect(Collectors.toList()))
         );
     }
 
     public void draw(Graphics2D g) {
         cells.forEach(cell -> cell.draw(g));
-        new ArrayList<>(units).forEach(unit ->
-                unit.draw((Graphics2D) g.create(
-                        unit.getPosition().getX() * SIZE,
-                        unit.getPosition().getY() * SIZE,
-                        SIZE - 1,
-                        SIZE - 1)
-                )
+        Map<Position, List<LivingUnit>> unitsByPosition =
+                new ArrayList<>(units).stream().collect(Collectors.groupingBy(LivingUnit::getPosition));
+        unitsByPosition.forEach((position, units) -> {
+                    units.stream().findAny().ifPresent(unit ->
+                            unit.draw((Graphics2D) g.create(
+                                    position.getX() * SIZE,
+                                    position.getY() * SIZE,
+                                    SIZE - 1,
+                                    SIZE - 1)
+                            )
+                    );
+                    if (units.size() > 1) {
+                        g.setColor(Color.BLACK);
+                        g.drawString(Integer.toString(units.size()),
+                                position.getX() * SIZE,
+                                (position.getY() + 1) * SIZE);
+                    }
+                }
         );
     }
 

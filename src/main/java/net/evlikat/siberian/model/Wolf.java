@@ -28,7 +28,7 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     protected static final int SIZE = CONF.getInt("draw.size");
 
     private static final Map<Sex, Color> SEX_COLOR = new EnumMap<>(Sex.class);
-    private static final Color LOST_HEALTH = Color.RED;
+    private static final Color LOST_HEALTH = Color.PINK;
 
     static {
         SEX_COLOR.put(Sex.MALE, Color.ORANGE);
@@ -50,10 +50,11 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     @Override
     public void draw(Graphics2D g) {
         g.setColor(LOST_HEALTH);
-        g.fillOval(0, 0, SIZE - 1, SIZE - 1);
+        int healthyArcAngle = (int) (health.part() * 360);
+        g.fillArc(0, 0, SIZE - 1, SIZE - 1, 90 + healthyArcAngle, 360 - healthyArcAngle);
         g.setColor(SEX_COLOR.get(sex));
-        g.fillArc(0, 0, SIZE - 1, SIZE - 1, 90, (int) (health.part() * 360));
-        pregnancy.ifPresent(gauge -> g.fillRect(SIZE - FETUS_SIZE, SIZE, FETUS_SIZE - 1, FETUS_SIZE - 1));
+        g.fillArc(0, 0, SIZE - 1, SIZE - 1, 90, healthyArcAngle);
+        pregnancy.ifPresent(gauge -> g.fillRect(SIZE - FETUS_SIZE, 0, FETUS_SIZE - 1, FETUS_SIZE - 1));
     }
 
     @Override

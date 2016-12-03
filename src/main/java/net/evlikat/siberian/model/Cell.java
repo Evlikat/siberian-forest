@@ -1,11 +1,17 @@
 package net.evlikat.siberian.model;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
 import java.awt.*;
 
 public class Cell implements DrawableUnit {
 
-    public static final int SIZE = 20;
-    public static final Color BORDER = Color.LIGHT_GRAY;
+    protected static final Config CONF = ConfigFactory.load().getConfig("cell");
+
+    public static final int SIZE = CONF.getInt("draw.size");
+
+    static final Color BORDER = Color.LIGHT_GRAY;
 
     private final Position position;
 
