@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,13 +28,7 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     protected static final int FETUS_SIZE = CONF.getInt("draw.fetus.size");
     protected static final int SIZE = CONF.getInt("draw.size");
 
-    private static final Map<Sex, Color> SEX_COLOR = new EnumMap<>(Sex.class);
     private static final Color LOST_HEALTH = Color.PINK;
-
-    static {
-        SEX_COLOR.put(Sex.MALE, Color.ORANGE);
-        SEX_COLOR.put(Sex.FEMALE, Color.BLUE);
-    }
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
@@ -52,7 +47,7 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
         g.setColor(LOST_HEALTH);
         int healthyArcAngle = (int) (health.part() * 360);
         g.fillArc(0, 0, SIZE - 1, SIZE - 1, 90 + healthyArcAngle, 360 - healthyArcAngle);
-        g.setColor(SEX_COLOR.get(sex));
+        g.setColor(sex.getColor());
         g.fillArc(0, 0, SIZE - 1, SIZE - 1, 90, healthyArcAngle);
         pregnancy.ifPresent(gauge -> g.fillRect(SIZE - FETUS_SIZE, 0, FETUS_SIZE - 1, FETUS_SIZE - 1));
     }
