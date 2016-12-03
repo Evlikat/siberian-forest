@@ -1,12 +1,17 @@
 package net.evlikat.siberian.swing;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.model.Cell;
 import net.evlikat.siberian.model.Field;
 import net.evlikat.siberian.model.Position;
 import net.evlikat.siberian.model.Rabbit;
+import net.evlikat.siberian.model.RegularWolf;
 import net.evlikat.siberian.model.Sex;
 import net.evlikat.siberian.model.Wolf;
 
 import javax.swing.JPanel;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -17,13 +22,16 @@ import java.util.stream.IntStream;
 
 public class FieldVisualizationPanel extends JPanel {
 
-    public static final int WIDTH = 30;
-    public static final int HEIGHT = 30;
+    private static final Config CONF = ConfigFactory.load().getConfig("field");
+
+    public static final int WIDTH = CONF.getInt("width");
+    public static final int HEIGHT = CONF.getInt("height");
     //
     private Field field;
 
     public FieldVisualizationPanel() {
         super(true);
+        setPreferredSize(new Dimension(Cell.SIZE * WIDTH, Cell.SIZE * HEIGHT));
     }
 
     public void init() {
@@ -35,15 +43,15 @@ public class FieldVisualizationPanel extends JPanel {
             }
         }, 0, 100);
 
-        IntStream.range(0, 100).forEach(i -> {
+        IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
             field.addUnit(new Rabbit(Position.on(randX, randY)));
         });
-        IntStream.range(0, 50).forEach(i -> {
+        IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new Wolf(Position.on(randX, randY), Sex.random()));
+            field.addUnit(new RegularWolf(Position.on(randX, randY), Sex.random()));
         });
     }
 

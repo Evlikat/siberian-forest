@@ -1,5 +1,9 @@
 package net.evlikat.siberian.model;
 
+import javafx.geometry.Pos;
+
+import static net.evlikat.siberian.utils.MathUtils.sgn;
+
 public enum Direction {
 
     NO(Position.on(0, 0)),

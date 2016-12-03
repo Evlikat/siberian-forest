@@ -9,4 +9,6 @@ public interface Visibility {
     int getHeight();
 
     Stream<LivingUnit> units();
+
+    Visibility local(Position p);
 }

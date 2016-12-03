@@ -1,5 +1,7 @@
 package net.evlikat.siberian.model;
 
+import static net.evlikat.siberian.utils.MathUtils.sgn;
+
 public class Position {
 
     private final int x;
@@ -35,6 +37,23 @@ public class Position {
 
     public boolean adjustableIn(int minX, int minY, int maxX, int maxY) {
         return x >= maxX || x < minX || y >= maxY || y < minY;
+    }
+
+    public int distance(Position anotherPosition) {
+        return Math.abs(x - anotherPosition.x) + Math.abs(y - anotherPosition.y);
+    }
+
+    public Position inDirectionTo(Position to) {
+        int deltaX = this.getX() - to.getX();
+        int deltaY = this.getY() - to.getY();
+        if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+            deltaX = -sgn(deltaX);
+            deltaY = 0;
+        } else {
+            deltaX = 0;
+            deltaY = -sgn(deltaY);
+        }
+        return deltaX == 0 && deltaY == 0 ? this : new Position(x + deltaX, y + deltaY);
     }
 
     @Override

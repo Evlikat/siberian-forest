@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static net.evlikat.siberian.model.Cell.SIZE;
 
-public class Field implements Visibility {
+public class Field {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Field.class);
 
@@ -41,13 +41,19 @@ public class Field implements Visibility {
 
     public void update() {
         turn++;
-        new ArrayList<>(units).forEach((drawableUnit) -> {
-            // TODO: consider 'sight'
-            drawableUnit.update(this);
-        });
+        new ArrayList<>(units).forEach(this::unitTurn);
         units = units.stream().filter(LivingUnit::isAlive).collect(Collectors.toCollection(ArrayList::new));
         justBornUnits.forEach(this::addUnit);
         justBornUnits.clear();
+    }
+
+    private void unitTurn(LivingUnit unit) {
+        unit.update(new WorldVisibility(
+                getWidth(),
+                getHeight(),
+                units().filter(u -> u.getPosition().distance(unit.getPosition()) <= unit.getSight())
+                        .collect(Collectors.toList()))
+        );
     }
 
     public void draw(Graphics2D g) {
@@ -62,16 +68,15 @@ public class Field implements Visibility {
         );
     }
 
-    public int getWidth() {
+    private int getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    private int getHeight() {
         return height;
     }
 
-    @Override
-    public Stream<LivingUnit> units() {
+    private Stream<LivingUnit> units() {
         return units.stream();
     }
 

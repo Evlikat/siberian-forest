@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class LivingUnit implements DrawableUnit {
@@ -18,25 +19,57 @@ public abstract class LivingUnit implements DrawableUnit {
     protected final NumberGauge health = new NumberGauge(0, 100);
     protected final NumberGauge age = new NumberGauge(0, 0, 1000);
     private final List<Consumer<LivingUnit>> birthListeners = new LinkedList<>();
-    private final List<Class<? extends LivingUnit>> canEat;
+    private final List<Class<? extends Food>> canEat;
 
     private Position position;
 
-    public LivingUnit(int sight, Position position, List<Class<? extends LivingUnit>> canEat) {
+    public LivingUnit(int sight, Position position, List<Class<? extends Food>> canEat) {
         this.sight = sight;
         this.position = position;
         this.canEat = canEat;
+    }
+
+    public int getSight() {
+        return sight;
     }
 
     public Position getPosition() {
         return position;
     }
 
-    protected void setPosition(Position position) {
+    private void setPosition(Position position) {
         this.position = position;
     }
 
-    public final void update() {
+    @Override
+    public final void update(Visibility visibility) {
+        updateUnitState();
+
+        move(visibility)
+                .filter(p -> p.distance(getPosition()) <= 1)
+                .ifPresent(p -> {
+                    setPosition(p);
+                    Visibility localVisibility = visibility.local(p);
+                    Optional<Food> fed = feed(localVisibility);
+                    fed.ifPresent(d -> {
+                        if (d.eaten()) {
+                            LOGGER.debug("A Wolf[{}] on {} is eating", health, getPosition());
+                            health.setCurrent(health.getCurrent() + Rabbit.FOOD_VALUE);
+                        }
+                    });
+                    if (health.part() > 0.5d) {
+                        multiply(localVisibility);
+                    }
+                });
+    }
+
+    protected abstract Optional<Position> move(Visibility visibility);
+
+    protected abstract Optional<Food> feed(Visibility visibility);
+
+    protected abstract void multiply(Visibility visibility);
+
+    private void updateUnitState() {
         if (!alive) {
             return;
         }
@@ -75,7 +108,7 @@ public abstract class LivingUnit implements DrawableUnit {
 
     protected abstract void updateGauges();
 
-    public boolean canEat(Class<? extends LivingUnit> eatable) {
+    public boolean canEat(Class<? extends Food> eatable) {
         return canEat.contains(eatable);
     }
 }
