@@ -56,6 +56,19 @@ public class Position {
         return deltaX == 0 && deltaY == 0 ? this : new Position(x + deltaX, y + deltaY);
     }
 
+    public Position awayFrom(Position to) {
+        int deltaX = this.getX() - to.getX();
+        int deltaY = this.getY() - to.getY();
+        if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+            deltaX = MathUtils.sgn(deltaX);
+            deltaY = 0;
+        } else {
+            deltaX = 0;
+            deltaY = MathUtils.sgn(deltaY);
+        }
+        return deltaX == 0 && deltaY == 0 ? this : new Position(x + deltaX, y + deltaY);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
