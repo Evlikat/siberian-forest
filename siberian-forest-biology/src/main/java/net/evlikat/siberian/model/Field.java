@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static net.evlikat.siberian.model.Cell.SIZE;
 
@@ -37,31 +36,47 @@ public class Field {
     public static Field create(int width, int height) {
         ArrayList<Cell> cells = new ArrayList<>(width * height);
         IntStream.range(0, width * height)
-                .forEach(i -> cells.add(new Cell(i % width, i / width)));
+                .forEach(i -> {
+                    Position position = Position.on(i % width, i / width);
+                    cells.add(new Cell(position, new Grass(position)));
+                });
         return new Field(width, height, cells);
     }
 
     public void update() {
         turn++;
+        new ArrayList<>(cells).forEach(this::cellTurn);
         new ArrayList<>(units).forEach(this::unitTurn);
         units = units.stream().filter(LivingUnit::isAlive).collect(Collectors.toCollection(ArrayList::new));
         justBornUnits.forEach(this::addUnit);
         justBornUnits.clear();
     }
 
+    private void cellTurn(Cell cell) {
+        cell.update();
+    }
+
     private void unitTurn(LivingUnit unit) {
         unit.update(new WorldVisibility(
                 getWidth(),
                 getHeight(),
-                units()
+                units.stream()
                         .filter(u -> u != unit)
                         .filter(u -> u.getPosition().distance(unit.getPosition()) <= unit.getSight())
+                        .collect(Collectors.toList()),
+                cells.stream()
+                        .filter(c -> c.getPosition().distance(unit.getPosition()) <= unit.getSight())
                         .collect(Collectors.toList()))
         );
     }
 
     public void draw(Graphics2D g) {
-        cells.forEach(cell -> cell.draw(g));
+        cells.forEach(cell -> cell.draw((Graphics2D) g.create(
+                cell.getX() * SIZE,
+                cell.getY() * SIZE,
+                SIZE - 1,
+                SIZE - 1)
+        ));
         Map<Position, List<LivingUnit>> unitsByPosition =
                 new ArrayList<>(units).stream().collect(Collectors.groupingBy(LivingUnit::getPosition));
         unitsByPosition.forEach((position, units) -> {
@@ -89,18 +104,6 @@ public class Field {
 
     private int getHeight() {
         return height;
-    }
-
-    private Stream<LivingUnit> units() {
-        return units.stream();
-    }
-
-    public Cell get(int x, int y) {
-        return cells.get(y * width + x);
-    }
-
-    public Cell set(int x, int y) {
-        return cells.set(y * width + x, new Cell(x, y));
     }
 
     public void addUnit(LivingUnit livingUnit) {

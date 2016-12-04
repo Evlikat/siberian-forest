@@ -10,5 +10,7 @@ public interface Visibility {
 
     Stream<LivingUnit> units();
 
+    Stream<Cell> cells();
+
     Visibility local(Position p);
 }

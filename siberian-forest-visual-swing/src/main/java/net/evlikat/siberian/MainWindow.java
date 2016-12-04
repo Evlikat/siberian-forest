@@ -14,6 +14,7 @@ public class MainWindow extends JFrame {
     private JPanel rootPanel;
     private JPanel managementPanel;
     private JButton stopStartButton;
+    private JButton updateButton;
     private FieldVisualizationPanel fieldPanel;
 
     public MainWindow() throws HeadlessException {
@@ -32,8 +33,11 @@ public class MainWindow extends JFrame {
 
         stopStartButton = styled(new JButton("Stop/Start"));
         stopStartButton.addActionListener(e -> fieldPanel.stopOrResume());
+        updateButton = styled(new JButton("Turn"));
+        updateButton.addActionListener(e -> fieldPanel.updateGame());
 
         managementPanel.add(stopStartButton);
+        managementPanel.add(updateButton);
 
         fieldPanel = new FieldVisualizationPanel();
         fieldPanel.setBackground(Color.WHITE);
@@ -45,6 +49,7 @@ public class MainWindow extends JFrame {
         setContentPane(rootPanel);
         pack();
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
     }
 
@@ -55,6 +60,7 @@ public class MainWindow extends JFrame {
         Border margin = new EmptyBorder(5, 15, 5, 15);
         Border compound = new CompoundBorder(line, margin);
         button.setBorder(compound);
+        button.setMinimumSize(new Dimension(100, 30));
         return button;
     }
 }

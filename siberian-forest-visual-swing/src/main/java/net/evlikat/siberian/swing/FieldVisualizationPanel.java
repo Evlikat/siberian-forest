@@ -6,6 +6,7 @@ import net.evlikat.siberian.model.Cell;
 import net.evlikat.siberian.model.Field;
 import net.evlikat.siberian.model.Position;
 import net.evlikat.siberian.model.Rabbit;
+import net.evlikat.siberian.model.RegularRabbit;
 import net.evlikat.siberian.model.RegularWolf;
 import net.evlikat.siberian.model.Sex;
 
@@ -40,7 +41,7 @@ public class FieldVisualizationPanel extends JPanel {
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new Rabbit(Position.on(randX, randY)));
+            field.addUnit(new RegularRabbit(Position.on(randX, randY)));
         });
         IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);

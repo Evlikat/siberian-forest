@@ -55,7 +55,7 @@ public class RegularWolf extends Wolf {
         } else {
             return Optional.of(visibility.units()
                     .map(InterestUnit::new)
-                    .filter(p -> p.asMate != null && p.asMate.sex != this.sex)
+                    .filter(p -> p.asMate != null && p.asMate.sex != this.sex && p.asMate.adult())
                     .map(p -> p.asMate)
                     .map(mate -> Pair.of(mate.getPosition(), getPosition().distance(mate.getPosition())))
                     .min((p1, p2) -> Integer.compare(p1.getValue(), p2.getValue()))

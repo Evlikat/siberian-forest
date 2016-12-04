@@ -16,15 +16,16 @@ public abstract class LivingUnit implements DrawableUnit {
     private boolean alive = true;
 
     private final int sight;
+    protected final NumberGauge age;
     protected final NumberGauge health = new NumberGauge(0, 100);
-    protected final NumberGauge age = new NumberGauge(0, 0, 1000);
     private final List<Consumer<LivingUnit>> birthListeners = new LinkedList<>();
     private final List<Class<? extends Food>> canEat;
 
     private Position position;
 
-    public LivingUnit(int sight, Position position, List<Class<? extends Food>> canEat) {
+    public LivingUnit(int sight, int maxAge, Position position, List<Class<? extends Food>> canEat) {
         this.sight = sight;
+        this.age = new NumberGauge(0, 0, maxAge);
         this.position = position;
         this.canEat = canEat;
     }
@@ -53,8 +54,8 @@ public abstract class LivingUnit implements DrawableUnit {
                     Optional<Food> fed = feed(localVisibility);
                     fed.ifPresent(d -> {
                         if (d.eaten()) {
-                            LOGGER.debug("A Wolf[{}] on {} is eating", health, getPosition());
-                            health.setCurrent(health.getCurrent() + Rabbit.FOOD_VALUE);
+                            LOGGER.debug("A {}[{}] on {} is eating", getClass().getSimpleName(), health, getPosition());
+                            health.setCurrent(health.getCurrent() + d.getFoodValue());
                         }
                     });
                     if (health.part() > 0.5d) {
@@ -73,7 +74,7 @@ public abstract class LivingUnit implements DrawableUnit {
         if (!alive) {
             return;
         }
-        age.inc();
+        age.plus(1);
         updateGauges();
         if (dead()) {
             kill();
@@ -108,7 +109,7 @@ public abstract class LivingUnit implements DrawableUnit {
 
     protected abstract void updateGauges();
 
-    public boolean canEat(Class<? extends Food> eatable) {
-        return canEat.contains(eatable);
+    public final boolean canEat(Class<? extends Food> foodClass) {
+        return canEat.stream().anyMatch(eatable -> eatable.isAssignableFrom(foodClass));
     }
 }

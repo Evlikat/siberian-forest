@@ -14,12 +14,12 @@ public class NumberGauge extends Gauge<Integer> {
         return getCurrent().floatValue() / getMax().floatValue();
     }
 
-    public void inc() {
-        setCurrent(getCurrent() + 1);
+    public void plus(int delta) {
+        setCurrent(getCurrent() + delta);
     }
 
-    public void dec() {
-        setCurrent(getCurrent() - 1);
+    public void minus(int delta) {
+        setCurrent(getCurrent() - delta);
     }
 
     @Override

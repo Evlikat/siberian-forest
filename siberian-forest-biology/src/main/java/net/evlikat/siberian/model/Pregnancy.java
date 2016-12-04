@@ -13,7 +13,7 @@ class Pregnancy {
     }
 
     public boolean incAndWhelp(Consumer<NumberGauge> birth) {
-        pregnancyCounter.inc();
+        pregnancyCounter.plus(1);
         if (pregnancyCounter.atMax()) {
             birth.accept(pregnancyCounter);
             return true;

@@ -5,24 +5,21 @@ import com.typesafe.config.ConfigFactory;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-public class Rabbit extends LivingUnit implements Food {
+public abstract class Rabbit extends LivingUnit implements Food {
 
     private static final Config CONF = ConfigFactory.load().getConfig("rabbit");
 
+    private static final int MAX_AGE = CONF.getInt("maxAge");
     private static final double DIVISION_RATE = CONF.getDouble("division.rate");
     private static final int SIZE = CONF.getInt("draw.size");
-    public static final int FOOD_VALUE = CONF.getInt("foodValue");
-    private static final Color BORDER = Color.PINK;
+    private static final int FOOD_VALUE = CONF.getInt("foodValue");
+    private static final Color BORDER = new Color(117, 66, 16);
 
     public Rabbit(Position position) {
-        super(3, position, Collections.emptyList());
+        super(3, MAX_AGE, position, Collections.emptyList());
     }
 
     @Override
@@ -44,34 +41,16 @@ public class Rabbit extends LivingUnit implements Food {
     }
 
     @Override
-    public Optional<Position> move(Visibility visibility) {
-
-        List<Position> availableDirections = Arrays.stream(Direction.values())
-                .map(dir -> getPosition().by(dir))
-                .filter(newPos -> !newPos.adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
-                .collect(Collectors.toList());
-
-        return Optional.of(availableDirections)
-                .filter(c -> !c.isEmpty())
-                .map(dirs -> dirs
-                        .get(ThreadLocalRandom.current().nextInt(availableDirections.size())));
-    }
-
-    @Override
-    protected Optional<Food> feed(Visibility visibility) {
-        // eat the solar power
-        return Optional.empty();
-    }
-
-    @Override
     protected void multiply(Visibility visibility) {
         if (ThreadLocalRandom.current().nextDouble() < DIVISION_RATE) {
-            birth(new Rabbit(getPosition()));
+            birth(newRabbit());
         }
     }
 
+    protected abstract Rabbit newRabbit();
+
     @Override
     protected void updateGauges() {
-        // immortal
+        health.minus(1);
     }
 }

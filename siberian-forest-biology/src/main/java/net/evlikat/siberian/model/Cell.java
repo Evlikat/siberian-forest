@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory;
 
 import java.awt.*;
 
-public class Cell implements DrawableUnit {
+public class Cell {
 
     protected static final Config CONF = ConfigFactory.load().getConfig("cell");
 
@@ -14,12 +14,13 @@ public class Cell implements DrawableUnit {
     static final Color BORDER = Color.LIGHT_GRAY;
 
     private final Position position;
+    private final Grass grass;
 
-    public Cell(int x, int y) {
-        this.position = Position.on(x, y);
+    public Cell(Position position, Grass grass) {
+        this.grass = grass;
+        this.position = position;
     }
 
-    @Override
     public Position getPosition() {
         return position;
     }
@@ -32,13 +33,17 @@ public class Cell implements DrawableUnit {
         return position.getY();
     }
 
-    @Override
-    public void update(Visibility visibility) {
-        // nothing changes
+    public void draw(Graphics2D g) {
+        grass.draw(g);
+        g.setColor(BORDER);
+        g.drawRect(0, 0, SIZE - 1, SIZE - 1);
     }
 
-    public void draw(Graphics2D g) {
-        g.setColor(BORDER);
-        g.drawRect(getX() * SIZE, getY() * SIZE, SIZE - 1, SIZE - 1);
+    public Grass getGrass() {
+        return grass;
+    }
+
+    public void update() {
+        grass.update(WorldVisibility.no());
     }
 }
