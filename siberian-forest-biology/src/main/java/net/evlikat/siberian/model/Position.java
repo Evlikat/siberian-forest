@@ -1,6 +1,6 @@
 package net.evlikat.siberian.model;
 
-import static net.evlikat.siberian.utils.MathUtils.sgn;
+import net.evlikat.siberian.utils.MathUtils;
 
 public class Position {
 
@@ -47,11 +47,11 @@ public class Position {
         int deltaX = this.getX() - to.getX();
         int deltaY = this.getY() - to.getY();
         if (Math.abs(deltaX) >= Math.abs(deltaY)) {
-            deltaX = -sgn(deltaX);
+            deltaX = -MathUtils.sgn(deltaX);
             deltaY = 0;
         } else {
             deltaX = 0;
-            deltaY = -sgn(deltaY);
+            deltaY = -MathUtils.sgn(deltaY);
         }
         return deltaX == 0 && deltaY == 0 ? this : new Position(x + deltaX, y + deltaY);
     }

@@ -8,7 +8,6 @@ import net.evlikat.siberian.model.Position;
 import net.evlikat.siberian.model.Rabbit;
 import net.evlikat.siberian.model.RegularWolf;
 import net.evlikat.siberian.model.Sex;
-import net.evlikat.siberian.model.Wolf;
 
 import javax.swing.JPanel;
 import java.awt.Dimension;
