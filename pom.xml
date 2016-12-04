@@ -26,6 +26,7 @@
         <module>siberian-forest-biology</module>
         <module>siberian-forest-commons</module>
         <module>siberian-forest-visual-swing</module>
+        <module>siberian-forest-biology-impl</module>
     </modules>
     <dependencies>
         <dependency>
