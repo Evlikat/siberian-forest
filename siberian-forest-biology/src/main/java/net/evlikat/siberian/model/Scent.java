@@ -14,6 +14,10 @@ public class Scent {
         power.setCurrent(power.getMax());
     }
 
+    public Integer get() {
+        return power.getCurrent();
+    }
+
     @Override
     public String toString() {
         return "Scent{" + power + '}';

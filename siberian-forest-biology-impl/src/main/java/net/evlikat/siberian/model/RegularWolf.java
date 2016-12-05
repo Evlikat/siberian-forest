@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.evlikat.siberian.model.RegularWolfTargetAttitude.COMPETITOR;
 import static net.evlikat.siberian.model.RegularWolfTargetAttitude.FOOD;
@@ -35,17 +37,32 @@ public class RegularWolf extends Wolf {
     }
 
     private boolean wantsToEat() {
-        return health.part() < 0.75d;
+        return health.part() < 0.5d;
     }
 
     @Override
     protected Optional<Position> move(Visibility visibility) {
         EnumMap<RegularWolfTargetAttitude, Integer> valueMap = buildValueMap();
+        Map<Position, Set<RegularWolfTargetAttitude>> positionValues = updateWithUnits(visibility.units());
+        Map<Position, Integer> cellValues = updateWithCells(visibility.cells());
 
-        Map<Position, List<LivingUnit>> positionUnits = visibility.units()
-                .collect(Collectors.groupingBy(LivingUnit::getPosition));
+        Map<Position, Integer> positionValueMap = positionValues.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream().mapToInt(valueMap::get).sum()));
+        cellValues.entrySet().forEach(e -> positionValueMap.merge(e.getKey(), e.getValue(), Integer::sum));
 
+        return positionValueMap.entrySet().stream()
+                .max((e1, e2) -> Integer.compare(e1.getValue(), e2.getValue()))
+                .map(max -> {
+                    List<Direction> availableDirections = Direction.shuffledValues()
+                            .filter(dir -> !getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
+                            .collect(Collectors.toList());
+                    return getPosition().inDirectionTo(max.getKey(), availableDirections);
+                });
+    }
+
+    private Map<Position, Set<RegularWolfTargetAttitude>> updateWithUnits(Stream<LivingUnit> units) {
         Map<Position, Set<RegularWolfTargetAttitude>> positionValues = new HashMap<>();
+        Map<Position, List<LivingUnit>> positionUnits = units.collect(Collectors.groupingBy(LivingUnit::getPosition));
 
         positionUnits.entrySet()
                 .forEach(p -> p.getValue().stream()
@@ -64,22 +81,18 @@ public class RegularWolf extends Wolf {
                         })
                 );
 
-        return positionValues.entrySet().stream()
-                .map(e -> Pair.of(e.getKey(), e.getValue().stream().mapToInt(valueMap::get).sum()))
-                .max((e1, e2) -> Integer.compare(e1.getValue(), e2.getValue()))
-                .map(max -> {
-                    List<Direction> availableDirections = Direction.shuffledValues()
-                            .filter(dir -> !getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
-                            .collect(Collectors.toList());
-                    return getPosition().inDirectionTo(max.getKey(), availableDirections);
-                });
+        return positionValues;
+    }
+
+    private Map<Position, Integer> updateWithCells(Stream<Cell> cells) {
+        return cells.collect(Collectors.toMap(Cell::getPosition, c -> c.getScent().get() / 2));
     }
 
     private EnumMap<RegularWolfTargetAttitude, Integer> buildValueMap() {
         EnumMap<RegularWolfTargetAttitude, Integer> valueMap = new EnumMap<>(RegularWolfTargetAttitude.class);
         valueMap.put(RegularWolfTargetAttitude.COMPETITOR, -5);
-        valueMap.put(RegularWolfTargetAttitude.FOOD, this.wantsToEat() ? 5 : 0);
-        valueMap.put(RegularWolfTargetAttitude.MATE, this.wantsToEat() ? 0 : 5);
+        valueMap.put(RegularWolfTargetAttitude.FOOD, this.wantsToEat() ? 10 : 0);
+        valueMap.put(RegularWolfTargetAttitude.MATE, this.wantsToEat() ? 0 : 10);
         return valueMap;
     }
 
