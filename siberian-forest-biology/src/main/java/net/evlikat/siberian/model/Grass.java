@@ -54,4 +54,12 @@ public class Grass implements Food, DrawableUnit {
     public Position getPosition() {
         return position;
     }
+
+    @Override
+    public String toString() {
+        return "Grass{" +
+                "amount=" + amount +
+                ", position=" + position +
+                '}';
+    }
 }

@@ -40,12 +40,12 @@ public class FieldVisualizationPanel extends JPanel {
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new RegularRabbit(Position.on(randX, randY)));
+            field.addUnit(new RegularRabbit(Position.on(randX, randY), field));
         });
         IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new RegularWolf(Position.on(randX, randY), Sex.random()));
+            field.addUnit(new RegularWolf(Position.on(randX, randY), Sex.random(), field));
         });
         repaint();
     }

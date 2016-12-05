@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 import static net.evlikat.siberian.model.Cell.SIZE;
 
-public class Field {
+public class Field implements ScentStorage {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Field.class);
 
@@ -107,6 +107,20 @@ public class Field {
                     }
                 }
         );
+    }
+
+    @Override
+    public Scent get(Position position) {
+        return cellOn(position).getScent();
+    }
+
+    @Override
+    public void update(Position position) {
+        cellOn(position).updateScent();
+    }
+
+    private Cell cellOn(Position position) {
+        return cells.get(position.getY() * width + position.getX());
     }
 
     private int getWidth() {

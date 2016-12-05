@@ -19,8 +19,8 @@ public abstract class Rabbit extends LivingUnit implements Food {
     private static final int FOOD_VALUE = CONF.getInt("foodValue");
     private static final Color BORDER = new Color(117, 66, 16);
 
-    public Rabbit(Position position) {
-        super(3, MAX_AGE, SPEED, position, Collections.emptyList());
+    public Rabbit(Position position, ScentStorage scentStorage) {
+        super(3, MAX_AGE, SPEED, position, Collections.emptyList(), scentStorage);
     }
 
     @Override

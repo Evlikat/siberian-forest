@@ -15,10 +15,12 @@ public class Cell {
 
     private final Position position;
     private final Grass grass;
+    private final Scent scent;
 
     public Cell(Position position, Grass grass) {
         this.grass = grass;
         this.position = position;
+        this.scent = new Scent();
     }
 
     public Position getPosition() {
@@ -43,7 +45,25 @@ public class Cell {
         return grass;
     }
 
+    public void updateScent() {
+        scent.restore();
+    }
+
+    public Scent getScent() {
+        return scent;
+    }
+
     public void update() {
         grass.update(WorldVisibility.no());
+        scent.update();
+    }
+
+    @Override
+    public String toString() {
+        return "Cell{" +
+                "position=" + position +
+                ", grass=" + grass +
+                ", scent=" + scent +
+                '}';
     }
 }

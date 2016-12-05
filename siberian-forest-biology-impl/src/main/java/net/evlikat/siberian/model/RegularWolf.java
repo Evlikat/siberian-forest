@@ -18,8 +18,8 @@ import static net.evlikat.siberian.model.RegularWolfTargetAttitude.MATE;
 
 public class RegularWolf extends Wolf {
 
-    public RegularWolf(Position position, Sex sex) {
-        super(position, sex);
+    public RegularWolf(Position position, Sex sex, ScentStorage scentStorage) {
+        super(position, sex, scentStorage);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class RegularWolf extends Wolf {
     }
 
     protected final RegularWolf newWolf() {
-        return new RegularWolf(getPosition(), Sex.random());
+        return new RegularWolf(getPosition(), Sex.random(), getScentStorage());
     }
 
     private static class InterestUnit {

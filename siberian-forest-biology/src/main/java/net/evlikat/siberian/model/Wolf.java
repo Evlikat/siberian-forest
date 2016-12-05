@@ -32,8 +32,8 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
 
-    public Wolf(Position position, Sex sex) {
-        super(SIGHT, MAX_AGE, SPEED, position, Collections.singletonList(Rabbit.class));
+    public Wolf(Position position, Sex sex, ScentStorage scentStorage) {
+        super(SIGHT, MAX_AGE, SPEED, position, Collections.singletonList(Rabbit.class), scentStorage);
         this.sex = sex;
     }
 
@@ -86,6 +86,11 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
                 pregnancy = Optional.empty();
             }
         });
+    }
+
+    @Override
+    protected void leaveScent() {
+        // I don't smell
     }
 
     protected abstract Wolf newWolf();

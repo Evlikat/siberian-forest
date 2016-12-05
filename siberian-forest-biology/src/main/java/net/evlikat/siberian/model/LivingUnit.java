@@ -19,6 +19,7 @@ public abstract class LivingUnit implements DrawableUnit {
 
     private final int sight;
     private final int speed;
+    private final ScentStorage scentStorage;
     protected final NumberGauge age;
     protected final NumberGauge health = new NumberGauge(0, 100);
     private final List<Consumer<LivingUnit>> birthListeners = new LinkedList<>();
@@ -26,12 +27,16 @@ public abstract class LivingUnit implements DrawableUnit {
 
     private Position position;
 
-    public LivingUnit(int sight, int maxAge, int speed, Position position, List<Class<? extends Food>> canEat) {
+    public LivingUnit(int sight, int maxAge, int speed,
+                      Position position,
+                      List<Class<? extends Food>> canEat,
+                      ScentStorage scentStorage) {
         this.sight = sight;
         this.speed = speed;
         this.age = new NumberGauge(0, 0, maxAge);
         this.position = position;
         this.canEat = canEat;
+        this.scentStorage = scentStorage;
     }
 
     public int getSight() {
@@ -46,6 +51,10 @@ public abstract class LivingUnit implements DrawableUnit {
         this.position = position;
     }
 
+    public ScentStorage getScentStorage() {
+        return scentStorage;
+    }
+
     public final void update(Function<LivingUnit, Visibility> getVisibility) {
         updateUnitState();
 
@@ -57,6 +66,7 @@ public abstract class LivingUnit implements DrawableUnit {
                             .ifPresent(p -> {
                                 if (p.in(visibility)) {
                                     setPosition(p);
+                                    leaveScent();
                                 }
                                 Visibility localVisibility = visibility.local(p);
                                 Optional<Food> fed = feed(localVisibility);
@@ -71,6 +81,10 @@ public abstract class LivingUnit implements DrawableUnit {
                                 }
                             });
                 });
+    }
+
+    protected void leaveScent() {
+        scentStorage.update(getPosition());
     }
 
     protected abstract Optional<Position> move(Visibility visibility);

@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 
 public class RegularRabbit extends Rabbit {
 
-    public RegularRabbit(Position position) {
-        super(position);
+    public RegularRabbit(Position position, ScentStorage scentStorage) {
+        super(position, scentStorage);
     }
 
     @Override
     protected RegularRabbit newRabbit() {
-        return new RegularRabbit(getPosition());
+        return new RegularRabbit(getPosition(), getScentStorage());
     }
 
     @Override
