@@ -6,7 +6,5 @@ public interface DrawableUnit {
 
     void draw(Graphics2D g);
 
-    void update(Visibility visibility);
-
     Position getPosition();
 }

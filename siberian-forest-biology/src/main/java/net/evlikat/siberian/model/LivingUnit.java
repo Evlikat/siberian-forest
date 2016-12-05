@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public abstract class LivingUnit implements DrawableUnit {
 
@@ -16,6 +18,7 @@ public abstract class LivingUnit implements DrawableUnit {
     private boolean alive = true;
 
     private final int sight;
+    private final int speed;
     protected final NumberGauge age;
     protected final NumberGauge health = new NumberGauge(0, 100);
     private final List<Consumer<LivingUnit>> birthListeners = new LinkedList<>();
@@ -23,8 +26,9 @@ public abstract class LivingUnit implements DrawableUnit {
 
     private Position position;
 
-    public LivingUnit(int sight, int maxAge, Position position, List<Class<? extends Food>> canEat) {
+    public LivingUnit(int sight, int maxAge, int speed, Position position, List<Class<? extends Food>> canEat) {
         this.sight = sight;
+        this.speed = speed;
         this.age = new NumberGauge(0, 0, maxAge);
         this.position = position;
         this.canEat = canEat;
@@ -42,25 +46,30 @@ public abstract class LivingUnit implements DrawableUnit {
         this.position = position;
     }
 
-    @Override
-    public final void update(Visibility visibility) {
+    public final void update(Function<LivingUnit, Visibility> getVisibility) {
         updateUnitState();
 
-        move(visibility)
-                .filter(p -> p.distance(getPosition()) <= 1)
-                .ifPresent(p -> {
-                    setPosition(p);
-                    Visibility localVisibility = visibility.local(p);
-                    Optional<Food> fed = feed(localVisibility);
-                    fed.ifPresent(d -> {
-                        if (d.eaten()) {
-                            LOGGER.debug("A {}[{}] on {} is eating", getClass().getSimpleName(), health, getPosition());
-                            health.setCurrent(health.getCurrent() + d.getFoodValue());
-                        }
-                    });
-                    if (health.part() > 0.5d) {
-                        multiply(localVisibility);
-                    }
+        IntStream.range(0, speed)
+                .forEach(step -> {
+                    Visibility visibility = getVisibility.apply(this);
+                    move(visibility)
+                            .filter(p -> p.distance(getPosition()) <= speed)
+                            .ifPresent(p -> {
+                                if (p.in(visibility)) {
+                                    setPosition(p);
+                                }
+                                Visibility localVisibility = visibility.local(p);
+                                Optional<Food> fed = feed(localVisibility);
+                                fed.ifPresent(d -> {
+                                    if (d.eaten()) {
+                                        LOGGER.debug("A {}[{}] on {} is eating", getClass().getSimpleName(), health, getPosition());
+                                        health.setCurrent(health.getCurrent() + d.getFoodValue());
+                                    }
+                                });
+                                if (health.part() > 0.5d) {
+                                    multiply(localVisibility);
+                                }
+                            });
                 });
     }
 

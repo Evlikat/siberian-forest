@@ -8,11 +8,14 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class MainWindow extends JFrame {
 
     private JPanel rootPanel;
     private JPanel managementPanel;
+    private JButton restartButton;
     private JButton stopStartButton;
     private JButton updateButton;
     private FieldVisualizationPanel fieldPanel;
@@ -28,16 +31,18 @@ public class MainWindow extends JFrame {
         rootPanel.setBackground(Color.WHITE);
 
         managementPanel = new JPanel();
-        BoxLayout managementLayout = new BoxLayout(managementPanel, BoxLayout.Y_AXIS);
-        managementPanel.setLayout(managementLayout);
+        managementPanel.setLayout(new GridBagLayout());
 
         stopStartButton = styled(new JButton("Stop/Start"));
         stopStartButton.addActionListener(e -> fieldPanel.stopOrResume());
         updateButton = styled(new JButton("Turn"));
         updateButton.addActionListener(e -> fieldPanel.updateGame());
+        restartButton = styled(new JButton("Restart"));
+        restartButton.addActionListener(e -> fieldPanel.init());
 
-        managementPanel.add(stopStartButton);
-        managementPanel.add(updateButton);
+        managementPanel.add(stopStartButton, gbc(0, 1));
+        managementPanel.add(updateButton, gbc(0, 2));
+        managementPanel.add(restartButton, gbc(0, 3));
 
         fieldPanel = new FieldVisualizationPanel();
         fieldPanel.setBackground(Color.WHITE);
@@ -51,6 +56,17 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
+    }
+
+    private GridBagConstraints gbc(int x, int y) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        return gbc;
     }
 
     private JButton styled(JButton button) {

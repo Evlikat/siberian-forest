@@ -1,5 +1,10 @@
 package net.evlikat.siberian.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Stream;
+
 public enum Direction {
 
     NO(Position.on(0, 0)),
@@ -20,5 +25,11 @@ public enum Direction {
 
     public int deltaY() {
         return delta.getY();
+    }
+
+    public static Stream<Direction> shuffledValues() {
+        ArrayList<Direction> directions = new ArrayList<>(Arrays.asList(values()));
+        Collections.shuffle(directions);
+        return directions.stream();
     }
 }

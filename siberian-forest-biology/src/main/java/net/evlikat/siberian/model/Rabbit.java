@@ -13,13 +13,14 @@ public abstract class Rabbit extends LivingUnit implements Food {
     private static final Config CONF = ConfigFactory.load().getConfig("rabbit");
 
     private static final int MAX_AGE = CONF.getInt("maxAge");
+    private static final int SPEED = CONF.getInt("speed");
     private static final double DIVISION_RATE = CONF.getDouble("division.rate");
     private static final int SIZE = CONF.getInt("draw.size");
     private static final int FOOD_VALUE = CONF.getInt("foodValue");
     private static final Color BORDER = new Color(117, 66, 16);
 
     public Rabbit(Position position) {
-        super(3, MAX_AGE, position, Collections.emptyList());
+        super(3, MAX_AGE, SPEED, position, Collections.emptyList());
     }
 
     @Override

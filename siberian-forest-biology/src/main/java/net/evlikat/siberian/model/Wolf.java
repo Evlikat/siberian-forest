@@ -19,6 +19,7 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     protected static final Config CONF = ConfigFactory.load().getConfig("wolf");
 
     protected static final int SIGHT = CONF.getInt("sight");
+    protected static final int SPEED = CONF.getInt("speed");
     protected static final int MAX_AGE = CONF.getInt("maxAge");
     protected static final double BIRTH_RATE = CONF.getDouble("birthRate");
     protected static final int ADULT = CONF.getInt("adult");
@@ -26,13 +27,13 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     protected static final int FETUS_SIZE = CONF.getInt("draw.fetus.size");
     protected static final int SIZE = CONF.getInt("draw.size");
 
-    private static final Color LOST_HEALTH = Color.PINK;
+    private static final Color LOST_HEALTH = Color.GRAY;
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
 
     public Wolf(Position position, Sex sex) {
-        super(SIGHT, MAX_AGE, position, Collections.singletonList(Rabbit.class));
+        super(SIGHT, MAX_AGE, SPEED, position, Collections.singletonList(Rabbit.class));
         this.sex = sex;
     }
 
@@ -78,6 +79,7 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
             if (p.incAndWhelp(g -> {
                 do {
                     birth(newWolf());
+                    health.minus(50);
                     LOGGER.debug("New wolf was born on {}", getPosition());
                 } while (ThreadLocalRandom.current().nextDouble() < BIRTH_RATE);
             })) {

@@ -27,7 +27,7 @@ public class FieldVisualizationPanel extends JPanel {
     public static final int WIDTH = CONF.getInt("width");
     public static final int HEIGHT = CONF.getInt("height");
     //
-    private Field field;
+    private volatile Field field;
     private volatile Timer timer;
 
     public FieldVisualizationPanel() {
@@ -37,7 +37,6 @@ public class FieldVisualizationPanel extends JPanel {
 
     public void init() {
         field = Field.create(WIDTH, HEIGHT);
-        start();
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
@@ -48,6 +47,7 @@ public class FieldVisualizationPanel extends JPanel {
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
             field.addUnit(new RegularWolf(Position.on(randX, randY), Sex.random()));
         });
+        repaint();
     }
 
     public void stopOrResume() {

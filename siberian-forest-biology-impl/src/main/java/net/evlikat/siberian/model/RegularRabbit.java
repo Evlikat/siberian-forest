@@ -22,11 +22,10 @@ public class RegularRabbit extends Rabbit {
 
     @Override
     public Optional<Position> move(Visibility visibility) {
-
-        List<Position> availableDirections = Arrays.stream(Direction.values())
-                .map(dir -> getPosition().by(dir))
-                .filter(newPos -> !newPos.adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
+        List<Direction> availableDirections = Direction.shuffledValues()
+                .filter(dir -> !getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
                 .collect(Collectors.toList());
+
         if (availableDirections.isEmpty()) {
             return Optional.empty();
         }
@@ -36,9 +35,13 @@ public class RegularRabbit extends Rabbit {
                 .map(predator -> Pair.of(predator.getPosition(), getPosition().distance(predator.getPosition())))
                 .min((p1, p2) -> Integer.compare(p1.getValue(), p2.getValue()))
                 .map(Pair::getKey)
-                .map(target -> getPosition().awayFrom(target))
-                .orElseGet(() ->
-                        availableDirections.get(ThreadLocalRandom.current().nextInt(availableDirections.size()))));
+                .map(target -> getPosition().awayFrom(target, availableDirections))
+                .orElseGet(() -> chosenRandomly(availableDirections)));
+    }
+
+    private Position chosenRandomly(List<Direction> availableDirections) {
+        return getPosition().adjust(availableDirections.get(
+                ThreadLocalRandom.current().nextInt(availableDirections.size())));
     }
 
     @Override

@@ -46,7 +46,6 @@ public class Grass implements Food, DrawableUnit {
         g.fillRect(0, 0, (int) g.getClipBounds().getWidth(), (int) g.getClipBounds().getHeight());
     }
 
-    @Override
     public void update(Visibility visibility) {
         amount.plus(INCREASE_RATE);
     }

@@ -57,7 +57,11 @@ public class Field {
     }
 
     private void unitTurn(LivingUnit unit) {
-        unit.update(new WorldVisibility(
+        unit.update(this::visibilityFor);
+    }
+
+    public WorldVisibility visibilityFor(LivingUnit unit) {
+        return new WorldVisibility(
                 getWidth(),
                 getHeight(),
                 units.stream()
@@ -66,8 +70,7 @@ public class Field {
                         .collect(Collectors.toList()),
                 cells.stream()
                         .filter(c -> c.getPosition().distance(unit.getPosition()) <= unit.getSight())
-                        .collect(Collectors.toList()))
-        );
+                        .collect(Collectors.toList()));
     }
 
     public void draw(Graphics2D g) {
@@ -80,7 +83,15 @@ public class Field {
         Map<Position, List<LivingUnit>> unitsByPosition =
                 new ArrayList<>(units).stream().collect(Collectors.groupingBy(LivingUnit::getPosition));
         unitsByPosition.forEach((position, units) -> {
-                    units.stream().findAny().ifPresent(unit ->
+                    units.stream().filter(u -> u instanceof Wolf).findAny().ifPresent(unit ->
+                            unit.draw((Graphics2D) g.create(
+                                    position.getX() * SIZE,
+                                    position.getY() * SIZE,
+                                    SIZE - 1,
+                                    SIZE - 1)
+                            )
+                    );
+                    units.stream().filter(u -> u instanceof Rabbit).findAny().ifPresent(unit ->
                             unit.draw((Graphics2D) g.create(
                                     position.getX() * SIZE,
                                     position.getY() * SIZE,

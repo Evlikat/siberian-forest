@@ -1,6 +1,9 @@
 package net.evlikat.siberian.model;
 
 import net.evlikat.siberian.utils.MathUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
 
 public class Position {
 
@@ -43,30 +46,30 @@ public class Position {
         return Math.abs(x - anotherPosition.x) + Math.abs(y - anotherPosition.y);
     }
 
-    public Position inDirectionTo(Position to) {
-        int deltaX = this.getX() - to.getX();
-        int deltaY = this.getY() - to.getY();
-        if (Math.abs(deltaX) >= Math.abs(deltaY)) {
-            deltaX = -MathUtils.sgn(deltaX);
-            deltaY = 0;
-        } else {
-            deltaX = 0;
-            deltaY = -MathUtils.sgn(deltaY);
-        }
-        return deltaX == 0 && deltaY == 0 ? this : new Position(x + deltaX, y + deltaY);
+    public Position inDirectionTo(Position to, List<Direction> availableDirections) {
+        return availableDirections.stream()
+                .map(dir -> Pair.of(dir, to.distance(adjust(dir))))
+                .min((p1, p2) -> Integer.compare(p1.getValue(), p2.getValue()))
+                .map(Pair::getKey)
+                .map(this::adjust)
+                .orElse(this);
     }
 
-    public Position awayFrom(Position to) {
-        int deltaX = this.getX() - to.getX();
-        int deltaY = this.getY() - to.getY();
-        if (Math.abs(deltaX) >= Math.abs(deltaY)) {
-            deltaX = MathUtils.sgn(deltaX);
-            deltaY = 0;
-        } else {
-            deltaX = 0;
-            deltaY = MathUtils.sgn(deltaY);
-        }
-        return deltaX == 0 && deltaY == 0 ? this : new Position(x + deltaX, y + deltaY);
+    public Position awayFrom(Position to, List<Direction> availableDirections) {
+        return availableDirections.stream()
+                .map(dir -> Pair.of(dir, to.distance(adjust(dir))))
+                .max((p1, p2) -> Integer.compare(p1.getValue(), p2.getValue()))
+                .map(Pair::getKey)
+                .map(this::adjust)
+                .orElse(this);
+    }
+
+    public boolean in(Visibility visibility) {
+        return !(x < 0 || x >= visibility.getWidth() || y < 0 || y >= visibility.getHeight());
+    }
+
+    public Position adjust(Direction direction) {
+        return new Position(x + direction.deltaX(), y + direction.deltaY());
     }
 
     @Override
