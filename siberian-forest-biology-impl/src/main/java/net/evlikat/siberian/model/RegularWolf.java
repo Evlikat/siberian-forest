@@ -1,7 +1,5 @@
 package net.evlikat.siberian.model;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,8 +17,8 @@ import static net.evlikat.siberian.model.RegularWolfTargetAttitude.MATE;
 
 public class RegularWolf extends Wolf {
 
-    public RegularWolf(Position position, Sex sex, ScentStorage scentStorage) {
-        super(position, sex, scentStorage);
+    public RegularWolf(Position position, int age, Sex sex, ScentStorage scentStorage) {
+        super(position, age, sex, scentStorage);
     }
 
     @Override
@@ -97,7 +94,7 @@ public class RegularWolf extends Wolf {
     }
 
     protected final RegularWolf newWolf() {
-        return new RegularWolf(getPosition(), Sex.random(), getScentStorage());
+        return new RegularWolf(getPosition(), 0, Sex.random(), getScentStorage());
     }
 
     private static class InterestUnit {

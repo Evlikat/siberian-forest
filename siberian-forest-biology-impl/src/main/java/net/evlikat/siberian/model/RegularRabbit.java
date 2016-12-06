@@ -2,7 +2,6 @@ package net.evlikat.siberian.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,13 +10,13 @@ import java.util.stream.Collectors;
 
 public class RegularRabbit extends Rabbit {
 
-    public RegularRabbit(Position position, ScentStorage scentStorage) {
-        super(position, scentStorage);
+    public RegularRabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
+        super(position, age, sex, scentStorage);
     }
 
     @Override
     protected RegularRabbit newRabbit() {
-        return new RegularRabbit(getPosition(), getScentStorage());
+        return new RegularRabbit(getPosition(), 0, Sex.random(), getScentStorage());
     }
 
     @Override

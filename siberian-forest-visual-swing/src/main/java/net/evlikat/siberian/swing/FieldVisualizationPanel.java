@@ -23,9 +23,14 @@ import java.util.stream.IntStream;
 public class FieldVisualizationPanel extends JPanel {
 
     private static final Config CONF = ConfigFactory.load().getConfig("field");
+    private static final Config RABBIT_CONF = ConfigFactory.load().getConfig("rabbit");
+    private static final Config WOLF_CONF = ConfigFactory.load().getConfig("wolf");
 
     public static final int WIDTH = CONF.getInt("width");
     public static final int HEIGHT = CONF.getInt("height");
+
+    public static final int RABBIT_MAX_AGE = RABBIT_CONF.getInt("maxAge");
+    public static final int WOLF_MAX_AGE = WOLF_CONF.getInt("maxAge");
     //
     private volatile Field field;
     private volatile Timer timer;
@@ -40,14 +45,18 @@ public class FieldVisualizationPanel extends JPanel {
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new RegularRabbit(Position.on(randX, randY), field));
+            field.addUnit(new RegularRabbit(Position.on(randX, randY), randomAge(RABBIT_MAX_AGE), Sex.random(), field));
         });
         IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new RegularWolf(Position.on(randX, randY), Sex.random(), field));
+            field.addUnit(new RegularWolf(Position.on(randX, randY), randomAge(WOLF_MAX_AGE), Sex.random(), field));
         });
         repaint();
+    }
+
+    private int randomAge(int max) {
+        return ThreadLocalRandom.current().nextInt(max / 2);
     }
 
     public void stopOrResume() {

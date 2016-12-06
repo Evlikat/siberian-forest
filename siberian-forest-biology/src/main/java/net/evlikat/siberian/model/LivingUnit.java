@@ -27,13 +27,13 @@ public abstract class LivingUnit implements DrawableUnit {
 
     private Position position;
 
-    public LivingUnit(int sight, int maxAge, int speed,
+    public LivingUnit(int sight, NumberGauge age, int speed,
                       Position position,
                       List<Class<? extends Food>> canEat,
                       ScentStorage scentStorage) {
         this.sight = sight;
         this.speed = speed;
-        this.age = new NumberGauge(0, 0, maxAge);
+        this.age = age;
         this.position = position;
         this.canEat = canEat;
         this.scentStorage = scentStorage;

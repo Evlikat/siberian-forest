@@ -2,6 +2,7 @@ package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.model.stats.NumberGauge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,8 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
 
-    public Wolf(Position position, Sex sex, ScentStorage scentStorage) {
-        super(SIGHT, MAX_AGE, SPEED, position, Collections.singletonList(Rabbit.class), scentStorage);
+    public Wolf(Position position, int age, Sex sex, ScentStorage scentStorage) {
+        super(SIGHT, new NumberGauge(age, 0, MAX_AGE), SPEED, position, Collections.singletonList(Rabbit.class), scentStorage);
         this.sex = sex;
     }
 
@@ -80,7 +81,7 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
                 do {
                     birth(newWolf());
                     health.minus(50);
-                    LOGGER.debug("New wolf was born on {}", getPosition());
+                    LOGGER.debug("A new wolf was born on {}", getPosition());
                 } while (ThreadLocalRandom.current().nextDouble() < BIRTH_RATE);
             })) {
                 pregnancy = Optional.empty();
