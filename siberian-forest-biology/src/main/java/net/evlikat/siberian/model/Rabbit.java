@@ -30,7 +30,7 @@ public abstract class Rabbit extends LivingUnit implements Food {
     private static final int FETUS_SIZE = CONF.getInt("draw.fetus.size");
     private static final Color BORDER = new Color(117, 66, 16);
 
-    private final Sex sex;
+    protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
 
     public Rabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
@@ -77,7 +77,7 @@ public abstract class Rabbit extends LivingUnit implements Food {
                 .ifPresent(mate -> pregnancy = Optional.of(new Pregnancy(PREGNANCY_TIME)));
     }
 
-    private boolean adult() {
+    protected boolean adult() {
         return age.getCurrent() >= ADULT;
     }
 
