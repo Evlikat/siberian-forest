@@ -69,16 +69,20 @@ public class RegularWolf extends Wolf {
                                 positionValues.computeIfAbsent(p.getKey(), (pos) -> new HashSet<>()).add(FOOD);
                             }
                             if (iu.asMate != null) {
-                                RegularWolfTargetAttitude attitude = COMPETITOR;
-                                if (iu.asMate.adult() && iu.asMate.sex != this.sex) {
-                                    attitude = MATE;
-                                }
+                                RegularWolfTargetAttitude attitude = goodPartner(iu.asMate) ? MATE : COMPETITOR;
                                 positionValues.computeIfAbsent(p.getKey(), (pos) -> new HashSet<>()).add(attitude);
                             }
                         })
                 );
 
         return positionValues;
+    }
+
+    private boolean goodPartner(Wolf candidate) {
+        return candidate.adult()
+                && candidate.sex != this.sex
+                && !candidate.pregnancy().isPresent()
+                && !pregnancy().isPresent();
     }
 
     private Map<Position, Integer> updateWithCells(Stream<Cell> cells) {

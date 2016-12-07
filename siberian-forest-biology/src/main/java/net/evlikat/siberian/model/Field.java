@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static net.evlikat.siberian.model.Cell.SIZE;
 
@@ -43,13 +44,16 @@ public class Field implements ScentStorage {
         return new Field(width, height, cells);
     }
 
-    public void update() {
+    public UpdateResult update() {
         turn++;
+        long st = System.currentTimeMillis();
         new ArrayList<>(cells).forEach(this::cellTurn);
         new ArrayList<>(units).forEach(this::unitTurn);
         units = units.stream().filter(LivingUnit::isAlive).collect(Collectors.toCollection(ArrayList::new));
         justBornUnits.forEach(this::addUnit);
         justBornUnits.clear();
+        long end = System.currentTimeMillis();
+        return new UpdateResult(end - st, units.size());
     }
 
     private void cellTurn(Cell cell) {
@@ -134,5 +138,10 @@ public class Field implements ScentStorage {
     public void addUnit(LivingUnit livingUnit) {
         livingUnit.addBirthListener(justBornUnits::add);
         units.add(livingUnit);
+    }
+
+    public Stream<LivingUnit> unitsOn(Position position) {
+        return new ArrayList<>(units).stream()
+                .filter(u -> u.getPosition().equals(position));
     }
 }

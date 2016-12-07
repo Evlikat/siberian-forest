@@ -97,4 +97,15 @@ public abstract class Rabbit extends LivingUnit implements Food {
             }
         });
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                "age=" + age +
+                ", health=" + health +
+                ", sex=" + sex +
+                ", pregnant=" + pregnancy().map(Object::toString).orElse("none") +
+                ", position=" + getPosition() +
+                '}';
+    }
 }

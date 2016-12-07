@@ -68,19 +68,19 @@ public abstract class LivingUnit implements DrawableUnit {
                                     setPosition(p);
                                     leaveScent();
                                 }
-                                Visibility localVisibility = visibility.local(p);
-                                Optional<Food> fed = feed(localVisibility);
-                                fed.ifPresent(d -> {
-                                    if (d.eaten()) {
-                                        LOGGER.debug("A {}[{}] on {} is eating", getClass().getSimpleName(), health, getPosition());
-                                        health.setCurrent(health.getCurrent() + d.getFoodValue());
-                                    }
-                                });
-                                if (health.part() > 0.5d) {
-                                    multiply(localVisibility);
-                                }
                             });
                 });
+        Visibility localVisibility = getVisibility.apply(this).local(getPosition());
+        Optional<Food> fed = feed(localVisibility);
+        fed.ifPresent(d -> {
+            if (d.eaten()) {
+                LOGGER.debug("A {}[{}] on {} is eating", getClass().getSimpleName(), health, getPosition());
+                health.setCurrent(health.getCurrent() + d.getFoodValue());
+            }
+        });
+        if (health.part() > 0.5d) {
+            multiply(localVisibility);
+        }
     }
 
     protected void leaveScent() {

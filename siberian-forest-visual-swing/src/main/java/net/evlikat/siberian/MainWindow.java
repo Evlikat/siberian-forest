@@ -3,6 +3,7 @@ package net.evlikat.siberian;
 import net.evlikat.siberian.swing.FieldVisualizationPanel;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -10,9 +11,12 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainWindow extends JFrame {
 
+    private JLabel infoLabel;
     private JPanel rootPanel;
     private JPanel managementPanel;
     private JButton restartButton;
@@ -27,10 +31,12 @@ public class MainWindow extends JFrame {
     public void init() {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        rootPanel = new JPanel(new FlowLayout());
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new BoxLayout(rootPanel, BoxLayout.PAGE_AXIS));
         rootPanel.setBackground(Color.WHITE);
 
         managementPanel = new JPanel();
+        managementPanel.setBackground(Color.WHITE);
         managementPanel.setLayout(new GridBagLayout());
 
         stopStartButton = styled(new JButton("Stop/Start"));
@@ -40,22 +46,44 @@ public class MainWindow extends JFrame {
         restartButton = styled(new JButton("Restart"));
         restartButton.addActionListener(e -> fieldPanel.init());
 
-        managementPanel.add(stopStartButton, gbc(0, 1));
-        managementPanel.add(updateButton, gbc(0, 2));
-        managementPanel.add(restartButton, gbc(0, 3));
+        managementPanel.add(stopStartButton, gbc(0, 0));
+        managementPanel.add(updateButton, gbc(1, 0));
+        managementPanel.add(restartButton, gbc(2, 0));
 
         fieldPanel = new FieldVisualizationPanel();
         fieldPanel.setBackground(Color.WHITE);
-        fieldPanel.init();
+        fieldPanel.setInfoConsumer(info -> infoLabel.setText(info));
 
-        rootPanel.add(managementPanel);
-        rootPanel.add(fieldPanel);
+        fieldPanel.init();
+        initMouseListener(fieldPanel);
+
+        infoLabel = new JLabel("Info");
+        infoLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+        rootPanel.add(managementPanel, BorderLayout.CENTER);
+        rootPanel.add(fieldPanel, BorderLayout.CENTER);
+        rootPanel.add(infoLabel, BorderLayout.EAST);
 
         setContentPane(rootPanel);
         pack();
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
+    }
+
+    private void initMouseListener(FieldVisualizationPanel panel) {
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    panel.putWolfOn(e.getPoint());
+                } else if (SwingUtilities.isLeftMouseButton(e)) {
+                    panel.putRabbitOn(e.getPoint());
+                } else {
+                    panel.showInfoAbout(e.getPoint());
+                }
+            }
+        });
     }
 
     private GridBagConstraints gbc(int x, int y) {

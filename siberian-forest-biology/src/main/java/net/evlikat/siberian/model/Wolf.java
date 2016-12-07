@@ -95,4 +95,15 @@ public abstract class Wolf extends LivingUnit implements DrawableUnit {
     }
 
     protected abstract Wolf newWolf();
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                "age=" + age +
+                ", health=" + health +
+                ", sex=" + sex +
+                ", pregnant=" + pregnancy().map(Object::toString).orElse("none") +
+                ", position=" + getPosition() +
+                '}';
+    }
 }

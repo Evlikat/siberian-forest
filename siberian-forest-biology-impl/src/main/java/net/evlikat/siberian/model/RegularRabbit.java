@@ -1,19 +1,16 @@
 package net.evlikat.siberian.model;
 
 import net.evlikat.siberian.utils.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +20,15 @@ import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.MATE;
 import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.PREDATOR;
 
 public class RegularRabbit extends Rabbit {
+
+    private static final Map<RegularRabbitTargetAttitude, Integer> VALUE_MAP = new EnumMap<>(RegularRabbitTargetAttitude.class);
+
+    static {
+        VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -20);
+        VALUE_MAP.put(RegularRabbitTargetAttitude.COMPETITOR, -5);
+        VALUE_MAP.put(RegularRabbitTargetAttitude.MATE, 10);
+        VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 10);
+    }
 
     public RegularRabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
         super(position, age, sex, scentStorage);
@@ -35,12 +41,11 @@ public class RegularRabbit extends Rabbit {
 
     @Override
     public Optional<Position> move(Visibility visibility) {
-        EnumMap<RegularRabbitTargetAttitude, Integer> valueMap = buildValueMap();
         Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = updateWithUnits(visibility.units());
 
         HashMap<Position, Integer> positionValueMap = positionValues.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey, e -> e.getValue().stream().mapToInt(valueMap::get).sum(),
+                        Map.Entry::getKey, e -> e.getValue().stream().mapToInt(VALUE_MAP::get).sum(),
                         Integer::sum, HashMap::new));
 
         List<Position> predatorPositions = positionValues.entrySet().stream()
@@ -48,9 +53,9 @@ public class RegularRabbit extends Rabbit {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
-        Integer predatorValue = valueMap.get(PREDATOR);
+        Integer predatorValue = VALUE_MAP.get(PREDATOR);
 
-        Optional<Map<Position, Integer>> totalValueMap = predatorPositions.stream()
+        Map<Position, Integer> unitValueMap = predatorPositions.stream()
                 .map(predatorPosition ->
                         (Map<Position, Integer>) visibility.cells()
                                 .map(Cell::getPosition)
@@ -58,13 +63,18 @@ public class RegularRabbit extends Rabbit {
                                         Function.identity(),
                                         pos -> predatorValue + predatorPosition.distance(pos),
                                         Integer::sum, HashMap::new)))
-                .reduce((map1, map2) -> CollectionUtils.mergeMaps(map1, map2, Integer::sum));
+                .reduce((map1, map2) -> CollectionUtils.mergeMaps(Integer::sum, map1, map2)).orElse(Collections.emptyMap());
 
-        return totalValueMap
-                .map(tvm -> CollectionUtils.mergeMaps(tvm, positionValueMap, Integer::sum))
-                .flatMap(
-                        vm -> vm.entrySet().stream()
-                                .max((e1, e2) -> Integer.compare(e1.getValue(), e2.getValue())))
+        Integer foodCellValue = VALUE_MAP.get(FOOD);
+        Map<Position, Integer> cellValues = visibility.cells()
+                .collect(Collectors.toMap(
+                        Cell::getPosition,
+                        c -> c.getGrass().getFoodCurrent() >= c.getGrass().getFoodValue() ? foodCellValue: 0));
+
+        Map<Position, Integer> totalValueMap = CollectionUtils.mergeMaps(
+                Integer::sum, unitValueMap, positionValueMap, cellValues);
+        return totalValueMap.entrySet().stream()
+                .max((e1, e2) -> Integer.compare(e1.getValue(), e2.getValue()))
                 .map(max -> {
                     List<Direction> availableDirections = Direction.shuffledValues()
                             .filter(dir -> !getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
@@ -85,10 +95,7 @@ public class RegularRabbit extends Rabbit {
                                 positionValues.computeIfAbsent(p.getKey(), (pos) -> new HashSet<>()).add(PREDATOR);
                             }
                             if (iu.asMate != null) {
-                                RegularRabbitTargetAttitude attitude = COMPETITOR;
-                                if (iu.asMate.adult() && iu.asMate.sex != this.sex) {
-                                    attitude = MATE;
-                                }
+                                RegularRabbitTargetAttitude attitude = goodPartner(iu.asMate) ? MATE : COMPETITOR;
                                 positionValues.computeIfAbsent(p.getKey(), (pos) -> new HashSet<>()).add(attitude);
                             }
                         })
@@ -97,17 +104,11 @@ public class RegularRabbit extends Rabbit {
         return positionValues;
     }
 
-    private EnumMap<RegularRabbitTargetAttitude, Integer> buildValueMap() {
-        EnumMap<RegularRabbitTargetAttitude, Integer> valueMap = new EnumMap<>(RegularRabbitTargetAttitude.class);
-        valueMap.put(RegularRabbitTargetAttitude.PREDATOR, -20);
-        valueMap.put(RegularRabbitTargetAttitude.COMPETITOR, -5);
-        valueMap.put(RegularRabbitTargetAttitude.MATE, this.wantsToEat() ? 0 : 10);
-        return valueMap;
-    }
-
-    private Position chosenRandomly(List<Direction> availableDirections) {
-        return getPosition().adjust(availableDirections.get(
-                ThreadLocalRandom.current().nextInt(availableDirections.size())));
+    private boolean goodPartner(Rabbit candidate) {
+        return candidate.adult()
+                && candidate.sex != this.sex
+                && !candidate.pregnancy().isPresent()
+                && !pregnancy().isPresent();
     }
 
     @Override

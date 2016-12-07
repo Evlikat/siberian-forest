@@ -31,6 +31,10 @@ public class Grass implements Food, DrawableUnit {
         return FOOD_VALUE;
     }
 
+    public int getFoodCurrent() {
+        return amount.getCurrent();
+    }
+
     @Override
     public boolean eaten() {
         if (amount.getCurrent() >= getFoodValue()) {

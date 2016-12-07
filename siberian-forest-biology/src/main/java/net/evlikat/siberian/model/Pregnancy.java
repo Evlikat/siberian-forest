@@ -20,4 +20,9 @@ class Pregnancy {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return pregnancyCounter.toString();
+    }
 }

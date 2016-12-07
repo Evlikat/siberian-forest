@@ -8,9 +8,12 @@ public final class CollectionUtils {
     private CollectionUtils() {
     }
 
-    public static <K, V> Map<K, V> mergeMaps(Map<K, V> map1, Map<K, V> map2, BinaryOperator<V> valueMerge) {
-        HashMap<K, V> result = new HashMap<>(map1);
-        map2.entrySet().forEach(e2 -> result.merge(e2.getKey(), e2.getValue(), valueMerge));
+    @SafeVarargs
+    public static <K, V> Map<K, V> mergeMaps(BinaryOperator<V> valueMerge, Map<K, V>... maps) {
+        HashMap<K, V> result = new HashMap<>();
+        for (Map<K, V> map : maps) {
+            map.entrySet().forEach(e2 -> result.merge(e2.getKey(), e2.getValue(), valueMerge));
+        }
         return result;
     }
 }
