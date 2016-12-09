@@ -2,7 +2,7 @@ package net.evlikat.siberian.model;
 
 import java.util.stream.Stream;
 
-public interface Visibility {
+public interface Visibility extends Sized {
 
     int getWidth();
 

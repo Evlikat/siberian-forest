@@ -1,9 +1,10 @@
 package net.evlikat.siberian.model;
 
-import net.evlikat.siberian.utils.MathUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Position {
 
@@ -64,8 +65,21 @@ public class Position {
                 .orElse(this);
     }
 
-    public boolean in(Visibility visibility) {
-        return !(x < 0 || x >= visibility.getWidth() || y < 0 || y >= visibility.getHeight());
+    public boolean in(Sized sized) {
+        return !(x < 0 || x >= sized.getWidth() || y < 0 || y >= sized.getHeight());
+    }
+
+    public Set<Position> around(int radius, Sized sized) {
+        Set<Position> result = new HashSet<>();
+        for (int ry = y - radius; ry <= y + radius; ry++) {
+            for (int rx = x - radius; rx <= x + radius; rx++) {
+                Position candidate = Position.on(rx, ry);
+                if (candidate.distance(this) <= radius && candidate.in(sized)) {
+                    result.add(candidate);
+                }
+            }
+        }
+        return result;
     }
 
     public Position adjust(Direction direction) {

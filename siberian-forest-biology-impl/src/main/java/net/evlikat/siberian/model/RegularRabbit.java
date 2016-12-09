@@ -48,22 +48,8 @@ public class RegularRabbit extends Rabbit {
                         Map.Entry::getKey, e -> e.getValue().stream().mapToInt(VALUE_MAP::get).sum(),
                         Integer::sum, HashMap::new));
 
-        List<Position> predatorPositions = positionValues.entrySet().stream()
-                .filter(e -> e.getValue().contains(PREDATOR))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        Integer predatorValue = VALUE_MAP.get(PREDATOR);
-
-        Map<Position, Integer> unitValueMap = predatorPositions.stream()
-                .map(predatorPosition ->
-                        (Map<Position, Integer>) visibility.cells()
-                                .map(Cell::getPosition)
-                                .collect(Collectors.toMap(
-                                        Function.identity(),
-                                        pos -> predatorValue + predatorPosition.distance(pos),
-                                        Integer::sum, HashMap::new)))
-                .reduce((map1, map2) -> CollectionUtils.mergeMaps(Integer::sum, map1, map2)).orElse(Collections.emptyMap());
+        Map<Position, Integer> predatorValueMap = updatePropagatingValues(visibility, PREDATOR, positionValues);
+        Map<Position, Integer> competitorValueMap = updatePropagatingValues(visibility, COMPETITOR, positionValues);
 
         Integer foodCellValue = VALUE_MAP.get(FOOD);
         Map<Position, Integer> cellValues = visibility.cells()
@@ -72,7 +58,7 @@ public class RegularRabbit extends Rabbit {
                         c -> c.getGrass().getFoodCurrent() >= c.getGrass().getFoodValue() ? foodCellValue: 0));
 
         Map<Position, Integer> totalValueMap = CollectionUtils.mergeMaps(
-                Integer::sum, unitValueMap, positionValueMap, cellValues);
+                Integer::sum, predatorValueMap, competitorValueMap, positionValueMap, cellValues);
         return totalValueMap.entrySet().stream()
                 .max((e1, e2) -> Integer.compare(e1.getValue(), e2.getValue()))
                 .map(max -> {
@@ -81,6 +67,26 @@ public class RegularRabbit extends Rabbit {
                             .collect(Collectors.toList());
                     return getPosition().inDirectionTo(max.getKey(), availableDirections);
                 });
+    }
+
+    private Map<Position, Integer> updatePropagatingValues(Visibility visibility, RegularRabbitTargetAttitude key,
+                                                           Map<Position, Set<RegularRabbitTargetAttitude>> positionValues) {
+        List<Position> negativePositions = positionValues.entrySet().stream()
+                .filter(e -> e.getValue().contains(key))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        Integer epicenterValue = VALUE_MAP.get(key);
+
+        return negativePositions.stream()
+                .map(position ->
+                        (Map<Position, Integer>) visibility.cells()
+                                .map(Cell::getPosition)
+                                .collect(Collectors.toMap(
+                                        Function.identity(),
+                                        pos -> epicenterValue + position.distance(pos),
+                                        Integer::sum, HashMap::new)))
+                .reduce((map1, map2) -> CollectionUtils.mergeMaps(Integer::sum, map1, map2)).orElse(Collections.emptyMap());
     }
 
     private Map<Position, Set<RegularRabbitTargetAttitude>> updateWithUnits(Stream<LivingUnit> units) {
