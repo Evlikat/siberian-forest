@@ -2,15 +2,12 @@ package net.evlikat.siberian.swing;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import net.evlikat.siberian.model.Cell;
+import net.evlikat.siberian.model.CellDrawer;
 import net.evlikat.siberian.model.Field;
-import net.evlikat.siberian.model.LivingUnit;
 import net.evlikat.siberian.model.Position;
-import net.evlikat.siberian.model.Rabbit;
-import net.evlikat.siberian.model.RegularRabbit;
-import net.evlikat.siberian.model.RegularWolf;
-import net.evlikat.siberian.model.Sex;
+import net.evlikat.siberian.model.RegularZooFactory;
 import net.evlikat.siberian.model.UpdateResult;
+import net.evlikat.siberian.model.ZooFactory;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -19,7 +16,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
@@ -30,23 +26,20 @@ import java.util.stream.IntStream;
 public class FieldVisualizationPanel extends JPanel {
 
     private static final Config CONF = ConfigFactory.load().getConfig("field");
-    private static final Config RABBIT_CONF = ConfigFactory.load().getConfig("rabbit");
-    private static final Config WOLF_CONF = ConfigFactory.load().getConfig("wolf");
 
     public static final int WIDTH = CONF.getInt("width");
     public static final int HEIGHT = CONF.getInt("height");
-
-    public static final int RABBIT_MAX_AGE = RABBIT_CONF.getInt("maxAge");
-    public static final int WOLF_MAX_AGE = WOLF_CONF.getInt("maxAge");
     //
     private volatile Field field;
     private volatile Timer timer;
     //
     private Consumer<String> infoConsumer;
 
+    private final ZooFactory zooFactory = new RegularZooFactory();
+
     public FieldVisualizationPanel() {
         super(true);
-        setPreferredSize(new Dimension(Cell.SIZE * WIDTH, Cell.SIZE * HEIGHT));
+        setPreferredSize(new Dimension(CellDrawer.SIZE * WIDTH, CellDrawer.SIZE * HEIGHT));
     }
 
     public void init() {
@@ -54,22 +47,18 @@ public class FieldVisualizationPanel extends JPanel {
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new RegularRabbit(Position.on(randX, randY), randomAge(RABBIT_MAX_AGE), Sex.random(), field));
+            field.addUnit(zooFactory.createRabbit(Position.on(randX, randY), field));
         });
         IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(new RegularWolf(Position.on(randX, randY), randomAge(WOLF_MAX_AGE), Sex.random(), field));
+            field.addUnit(zooFactory.createWolf(Position.on(randX, randY), field));
         });
         repaint();
     }
 
     public void setInfoConsumer(Consumer<String> infoConsumer) {
         this.infoConsumer = infoConsumer;
-    }
-
-    private int randomAge(int max) {
-        return ThreadLocalRandom.current().nextInt(max / 2);
     }
 
     public void stopOrResume() {
@@ -114,13 +103,17 @@ public class FieldVisualizationPanel extends JPanel {
     }
 
     public void putWolfOn(Point point) {
-        field.addUnit(new RegularWolf(positionBy(point), randomAge(WOLF_MAX_AGE), Sex.random(), field));
-        repaint();
+        if (timer == null) {
+            field.addUnit(zooFactory.createWolf(positionBy(point), field));
+            repaint();
+        }
     }
 
     public void putRabbitOn(Point point) {
-        field.addUnit(new RegularRabbit(positionBy(point), randomAge(RABBIT_MAX_AGE), Sex.random(), field));
-        repaint();
+        if (timer == null) {
+            field.addUnit(zooFactory.createRabbit(positionBy(point), field));
+            repaint();
+        }
     }
 
     public void showInfoAbout(Point point) {
@@ -131,8 +124,8 @@ public class FieldVisualizationPanel extends JPanel {
     }
 
     private Position positionBy(Point point) {
-        int x = (int) (point.getX() / Cell.SIZE);
-        int y = (int) (point.getY() / Cell.SIZE);
+        int x = (int) (point.getX() / CellDrawer.SIZE);
+        int y = (int) (point.getY() / CellDrawer.SIZE);
         return Position.on(x, y);
     }
 }

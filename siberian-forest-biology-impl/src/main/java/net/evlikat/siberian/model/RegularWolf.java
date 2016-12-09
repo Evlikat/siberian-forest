@@ -17,7 +17,7 @@ import static net.evlikat.siberian.model.RegularWolfTargetAttitude.MATE;
 
 public class RegularWolf extends Wolf {
 
-    public RegularWolf(Position position, int age, Sex sex, ScentStorage scentStorage) {
+    RegularWolf(Position position, int age, Sex sex, ScentStorage scentStorage) {
         super(position, age, sex, scentStorage);
     }
 

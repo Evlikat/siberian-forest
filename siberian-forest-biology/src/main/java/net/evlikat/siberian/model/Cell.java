@@ -1,44 +1,22 @@
 package net.evlikat.siberian.model;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import java.awt.Graphics2D;
 
-import java.awt.*;
+public class Cell extends AbstractCell<Cell> {
 
-public class Cell {
-
-    protected static final Config CONF = ConfigFactory.load().getConfig("cell");
-
-    public static final int SIZE = CONF.getInt("draw.size");
-
-    static final Color BORDER = Color.LIGHT_GRAY;
-
-    private final Position position;
+    private final Drawer<Cell> drawer;
     private final Grass grass;
     private final Scent scent;
 
-    public Cell(Position position, Grass grass) {
+    Cell(Position position, Grass grass, Drawer<Cell> drawer) {
+        super(position);
         this.grass = grass;
-        this.position = position;
+        this.drawer = drawer;
         this.scent = new Scent();
     }
 
-    public Position getPosition() {
-        return position;
-    }
-
-    public int getX() {
-        return position.getX();
-    }
-
-    public int getY() {
-        return position.getY();
-    }
-
-    public void draw(Graphics2D g) {
-        grass.draw(g);
-        g.setColor(BORDER);
-        g.drawRect(0, 0, SIZE - 1, SIZE - 1);
+    void draw(Graphics2D g) {
+        drawer.draw(this, g);
     }
 
     public Grass getGrass() {
@@ -61,7 +39,7 @@ public class Cell {
     @Override
     public String toString() {
         return "Cell{" +
-                "position=" + position +
+                "position=" + getPosition() +
                 ", grass=" + grass +
                 ", scent=" + scent +
                 '}';

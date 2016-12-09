@@ -13,11 +13,17 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static net.evlikat.siberian.model.Cell.SIZE;
+import static net.evlikat.siberian.model.CellDrawer.SIZE;
+import static net.evlikat.siberian.model.Direction.EAST;
+import static net.evlikat.siberian.model.Direction.NORTH;
+import static net.evlikat.siberian.model.Direction.SOUTH;
+import static net.evlikat.siberian.model.Direction.WEST;
 
 public class Field implements ScentStorage {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Field.class);
+
+    private static final CellFactory CELL_FACTORY = new CellFactory();
 
     private long turn = 0;
 
@@ -32,6 +38,20 @@ public class Field implements ScentStorage {
         this.width = width;
         this.height = height;
         this.cells = cells;
+        cells.forEach(c -> {
+            if (c.getPosition().getX() != 0) {
+                c.addNeighbour(cellOn(c.getPosition().adjust(WEST)));
+            }
+            if (c.getPosition().getY() != 0) {
+                c.addNeighbour(cellOn(c.getPosition().adjust(NORTH)));
+            }
+            if (c.getPosition().getX() != width - 1) {
+                c.addNeighbour(cellOn(c.getPosition().adjust(EAST)));
+            }
+            if (c.getPosition().getY() != height - 1) {
+                c.addNeighbour(cellOn(c.getPosition().adjust(SOUTH)));
+            }
+        });
     }
 
     public static Field create(int width, int height) {
@@ -39,7 +59,7 @@ public class Field implements ScentStorage {
         IntStream.range(0, width * height)
                 .forEach(i -> {
                     Position position = Position.on(i % width, i / width);
-                    cells.add(new Cell(position, new Grass(position)));
+                    cells.add(CELL_FACTORY.create(position, new Grass(position)));
                 });
         return new Field(width, height, cells);
     }
@@ -72,9 +92,8 @@ public class Field implements ScentStorage {
                         .filter(u -> u != unit)
                         .filter(u -> u.getPosition().distance(unit.getPosition()) <= unit.getSight())
                         .collect(Collectors.toList()),
-                cells.stream()
-                        .filter(c -> c.getPosition().distance(unit.getPosition()) <= unit.getSight())
-                        .collect(Collectors.toList()));
+                cellOn(unit.getPosition()).neighbours(unit.getSight())
+        );
     }
 
     public void draw(Graphics2D g) {

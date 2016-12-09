@@ -1,5 +1,6 @@
 package net.evlikat.siberian.model;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,10 +10,10 @@ public class WorldVisibility implements Visibility {
 
     private final int width;
     private final int height;
-    private final List<LivingUnit> units;
-    private final List<Cell> cells;
+    private final Collection<LivingUnit> units;
+    private final Collection<Cell> cells;
 
-    public WorldVisibility(int width, int height, List<LivingUnit> units, List<Cell> cells) {
+    public WorldVisibility(int width, int height, Collection<LivingUnit> units, Collection<Cell> cells) {
         this.width = width;
         this.height = height;
         this.units = units;

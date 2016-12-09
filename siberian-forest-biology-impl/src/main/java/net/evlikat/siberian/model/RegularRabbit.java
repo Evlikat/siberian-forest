@@ -30,7 +30,7 @@ public class RegularRabbit extends Rabbit {
         VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 10);
     }
 
-    public RegularRabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
+    RegularRabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
         super(position, age, sex, scentStorage);
     }
 
