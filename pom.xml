@@ -28,6 +28,7 @@
         <module>siberian-forest-visual-swing</module>
         <module>siberian-forest-biology-impl</module>
         <module>siberian-forest-geo</module>
+        <module>siberian-forest-swing-drawing</module>
     </modules>
     <dependencies>
         <dependency>

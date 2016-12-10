@@ -10,6 +10,7 @@ import net.evlikat.siberian.model.UpdateResult;
 import net.evlikat.siberian.model.Wolf;
 import net.evlikat.siberian.model.draw.factory.CellFactory;
 import net.evlikat.siberian.model.draw.factory.DrawableZooFactory;
+import net.evlikat.siberian.model.draw.factory.GrassFactory;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -39,12 +40,13 @@ public class DrawableField implements Drawable {
 
     public static DrawableField create(int width, int height,
                                        CellFactory cellFactory,
+                                       GrassFactory grassFactory,
                                        DrawableZooFactory drawableZooFactory) {
         ArrayList<DrawableCell> drawableCells = new ArrayList<>(width * height);
         IntStream.range(0, width * height)
                 .forEach(i -> {
                     Position position = Position.on(i % width, i / width);
-                    drawableCells.add(cellFactory.create(position, new Grass(position)));
+                    drawableCells.add(cellFactory.create(position, grassFactory.createGrass()));
                 });
         List<Cell> cells = drawableCells.stream().map(DrawableCell::getCell).collect(Collectors.toList());
         Field field = new Field(width, height, cells);

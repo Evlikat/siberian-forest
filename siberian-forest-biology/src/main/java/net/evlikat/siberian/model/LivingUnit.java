@@ -1,8 +1,7 @@
 package net.evlikat.siberian.model;
 
 import net.evlikat.siberian.geo.Position;
-import net.evlikat.siberian.model.draw.Drawable;
-import net.evlikat.siberian.model.stats.NumberGauge;
+import net.evlikat.siberian.utils.stats.NumberGauge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

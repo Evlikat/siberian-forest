@@ -1,4 +1,4 @@
-package net.evlikat.siberian.model.stats;
+package net.evlikat.siberian.utils.stats;
 
 public class Gauge<T extends Comparable<T>> {
 

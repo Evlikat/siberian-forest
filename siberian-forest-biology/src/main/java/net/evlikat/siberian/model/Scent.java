@@ -1,6 +1,6 @@
 package net.evlikat.siberian.model;
 
-import net.evlikat.siberian.model.stats.NumberGauge;
+import net.evlikat.siberian.utils.stats.NumberGauge;
 
 public class Scent {
 
