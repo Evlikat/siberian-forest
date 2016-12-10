@@ -6,6 +6,8 @@ import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.model.Field;
 import net.evlikat.siberian.model.UpdateResult;
 import net.evlikat.siberian.model.draw.CellDrawer;
+import net.evlikat.siberian.model.draw.DrawableField;
+import net.evlikat.siberian.model.draw.factory.CellFactory;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,7 +30,7 @@ public class FieldVisualizationPanel extends JPanel {
     public static final int WIDTH = CONF.getInt("width");
     public static final int HEIGHT = CONF.getInt("height");
     //
-    private volatile Field field;
+    private volatile DrawableField field;
     private volatile Timer timer;
     //
     private Consumer<String> infoConsumer;
@@ -39,7 +41,7 @@ public class FieldVisualizationPanel extends JPanel {
     }
 
     public void init() {
-        field = Field.create(WIDTH, HEIGHT, new DrawableZooFactoryImpl());
+        field = DrawableField.create(WIDTH, HEIGHT, new CellFactory(), new DrawableZooFactoryImpl());
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
