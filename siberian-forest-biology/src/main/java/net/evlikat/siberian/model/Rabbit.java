@@ -2,18 +2,17 @@ package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.model.stats.NumberGauge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Rabbit extends LivingUnit implements Food {
+public abstract class Rabbit extends LivingUnit<Rabbit> implements Food {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Rabbit.class);
 
@@ -26,10 +25,6 @@ public abstract class Rabbit extends LivingUnit implements Food {
     private static final int BIRTH_RATE = CONF.getInt("birthRate");
     private static final int FOOD_VALUE = CONF.getInt("foodValue");
 
-    private static final int SIZE = CONF.getInt("draw.size");
-    private static final int FETUS_SIZE = CONF.getInt("draw.fetus.size");
-    private static final Color BORDER = new Color(117, 66, 16);
-
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
 
@@ -38,20 +33,12 @@ public abstract class Rabbit extends LivingUnit implements Food {
         this.sex = sex;
     }
 
-    protected Optional<Pregnancy> pregnancy() {
+    public Optional<Pregnancy> pregnancy() {
         return pregnancy;
     }
 
-    @Override
-    public void draw(Graphics2D g) {
-        int size = adult() ? SIZE : (SIZE / 2);
-
-        int xPadding = (int) (g.getClipBounds().getWidth() - size) / 2;
-        int yPadding = (int) (g.getClipBounds().getHeight() - size) / 2;
-
-        g.setColor(BORDER);
-        g.fillRect(xPadding, yPadding, size - 1, size - 1);
-        pregnancy.ifPresent(gauge -> g.fillRect(size - FETUS_SIZE, 0, FETUS_SIZE - 1, FETUS_SIZE - 1));
+    public Sex sex() {
+        return sex;
     }
 
     @Override
@@ -77,7 +64,7 @@ public abstract class Rabbit extends LivingUnit implements Food {
                 .ifPresent(mate -> pregnancy = Optional.of(new Pregnancy(PREGNANCY_TIME)));
     }
 
-    protected boolean adult() {
+    public boolean adult() {
         return age.getCurrent() >= ADULT;
     }
 

@@ -1,5 +1,7 @@
 package net.evlikat.siberian.model;
 
+import net.evlikat.siberian.geo.Direction;
+import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.utils.CollectionUtils;
 
 import java.util.Collections;

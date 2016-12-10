@@ -2,6 +2,7 @@ package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.geo.Position;
 
 import java.util.concurrent.ThreadLocalRandom;
 

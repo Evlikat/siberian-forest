@@ -4,7 +4,7 @@ import net.evlikat.siberian.model.stats.NumberGauge;
 
 import java.util.function.Consumer;
 
-class Pregnancy {
+public class Pregnancy {
 
     private final NumberGauge pregnancyCounter;
 

@@ -1,8 +1,9 @@
 package net.evlikat.siberian.model;
 
+import net.evlikat.siberian.geo.Position;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

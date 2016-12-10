@@ -1,5 +1,7 @@
 package net.evlikat.siberian.model;
 
+import net.evlikat.siberian.geo.Position;
+import net.evlikat.siberian.model.draw.Drawable;
 import net.evlikat.siberian.model.stats.NumberGauge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-public abstract class LivingUnit implements DrawableUnit {
+public abstract class LivingUnit<T extends LivingUnit<T>> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LivingUnit.class);
 
@@ -22,7 +24,7 @@ public abstract class LivingUnit implements DrawableUnit {
     private final ScentStorage scentStorage;
     protected final NumberGauge age;
     protected final NumberGauge health = new NumberGauge(0, 100);
-    private final List<Consumer<LivingUnit>> birthListeners = new LinkedList<>();
+    private final List<Consumer<T>> birthListeners = new LinkedList<>();
     private final List<Class<? extends Food>> canEat;
 
     private Position position;
@@ -112,7 +114,7 @@ public abstract class LivingUnit implements DrawableUnit {
         return alive;
     }
 
-    public void birth(LivingUnit livingUnit) {
+    public void birth(T livingUnit) {
         birthListeners.forEach(bl -> bl.accept(livingUnit));
     }
 
@@ -126,7 +128,7 @@ public abstract class LivingUnit implements DrawableUnit {
         return false;
     }
 
-    public void addBirthListener(Consumer<LivingUnit> listener) {
+    public void addBirthListener(Consumer<T> listener) {
         birthListeners.add(listener);
     }
 
@@ -134,5 +136,9 @@ public abstract class LivingUnit implements DrawableUnit {
 
     public final boolean canEat(Class<? extends Food> foodClass) {
         return canEat.stream().anyMatch(eatable -> eatable.isAssignableFrom(foodClass));
+    }
+
+    public NumberGauge health() {
+        return health;
     }
 }

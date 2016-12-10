@@ -1,8 +1,6 @@
-package net.evlikat.siberian.model;
+package net.evlikat.siberian.geo;
 
-import java.util.Set;
-
-public abstract class AbstractCell<T extends AbstractCell<T>> {
+public abstract class AbstractCell {
 
     private final Position position;
 

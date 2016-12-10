@@ -2,12 +2,18 @@ package net.evlikat.siberian.swing;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import net.evlikat.siberian.model.CellDrawer;
+import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.model.Field;
-import net.evlikat.siberian.model.Position;
+import net.evlikat.siberian.model.Rabbit;
 import net.evlikat.siberian.model.RegularZooFactory;
+import net.evlikat.siberian.model.ScentStorage;
 import net.evlikat.siberian.model.UpdateResult;
-import net.evlikat.siberian.model.ZooFactory;
+import net.evlikat.siberian.model.Wolf;
+import net.evlikat.siberian.model.draw.CellDrawer;
+import net.evlikat.siberian.model.draw.DrawableLivingUnit;
+import net.evlikat.siberian.model.draw.RabbitDrawer;
+import net.evlikat.siberian.model.draw.WolfDrawer;
+import net.evlikat.siberian.model.draw.factory.DrawableZooFactory;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -35,24 +41,22 @@ public class FieldVisualizationPanel extends JPanel {
     //
     private Consumer<String> infoConsumer;
 
-    private final ZooFactory zooFactory = new RegularZooFactory();
-
     public FieldVisualizationPanel() {
         super(true);
         setPreferredSize(new Dimension(CellDrawer.SIZE * WIDTH, CellDrawer.SIZE * HEIGHT));
     }
 
     public void init() {
-        field = Field.create(WIDTH, HEIGHT);
+        field = Field.create(WIDTH, HEIGHT, new DrawableZooFactoryImpl());
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(zooFactory.createRabbit(Position.on(randX, randY), field));
+            field.addRabbitOn(Position.on(randX, randY));
         });
         IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addUnit(zooFactory.createWolf(Position.on(randX, randY), field));
+            field.addWolfOn(Position.on(randX, randY));
         });
         repaint();
     }
@@ -104,14 +108,14 @@ public class FieldVisualizationPanel extends JPanel {
 
     public void putWolfOn(Point point) {
         if (timer == null) {
-            field.addUnit(zooFactory.createWolf(positionBy(point), field));
+            field.addRabbitOn(positionBy(point));
             repaint();
         }
     }
 
     public void putRabbitOn(Point point) {
         if (timer == null) {
-            field.addUnit(zooFactory.createRabbit(positionBy(point), field));
+            field.addWolfOn(positionBy(point));
             repaint();
         }
     }

@@ -2,6 +2,8 @@ package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.geo.Position;
+import net.evlikat.siberian.model.draw.Drawable;
 import net.evlikat.siberian.model.stats.NumberGauge;
 
 import java.awt.Color;
@@ -9,7 +11,7 @@ import java.awt.Graphics2D;
 
 import static net.evlikat.siberian.utils.ColorUtils.modify;
 
-public class Grass implements Food, DrawableUnit {
+public class Grass implements Food, Drawable {
 
     protected static final Config CONF = ConfigFactory.load().getConfig("grass");
 
@@ -50,13 +52,8 @@ public class Grass implements Food, DrawableUnit {
         g.fillRect(0, 0, (int) g.getClipBounds().getWidth(), (int) g.getClipBounds().getHeight());
     }
 
-    public void update(Visibility visibility) {
+    public void update() {
         amount.plus(INCREASE_RATE);
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
     }
 
     @Override

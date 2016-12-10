@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>evlikat-games</groupId>
-    <artifactId>sibirian-forest</artifactId>
+    <artifactId>siberian-forest</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
@@ -27,6 +27,7 @@
         <module>siberian-forest-commons</module>
         <module>siberian-forest-visual-swing</module>
         <module>siberian-forest-biology-impl</module>
+        <module>siberian-forest-geo</module>
     </modules>
     <dependencies>
         <dependency>

@@ -1,22 +1,17 @@
 package net.evlikat.siberian.model;
 
-import java.awt.Graphics2D;
+import net.evlikat.siberian.geo.AbstractCell;
+import net.evlikat.siberian.geo.Position;
 
-public class Cell extends AbstractCell<Cell> {
+public class Cell extends AbstractCell {
 
-    private final Drawer<Cell> drawer;
     private final Grass grass;
     private final Scent scent;
 
-    Cell(Position position, Grass grass, Drawer<Cell> drawer) {
+    public Cell(Position position, Grass grass) {
         super(position);
         this.grass = grass;
-        this.drawer = drawer;
         this.scent = new Scent();
-    }
-
-    void draw(Graphics2D g) {
-        drawer.draw(this, g);
     }
 
     public Grass getGrass() {
@@ -32,7 +27,7 @@ public class Cell extends AbstractCell<Cell> {
     }
 
     public void update() {
-        grass.update(WorldVisibility.no());
+        grass.update();
         scent.update();
     }
 

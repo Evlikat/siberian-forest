@@ -1,4 +1,4 @@
-package net.evlikat.siberian.model;
+package net.evlikat.siberian.geo;
 
 import org.junit.Test;
 
@@ -7,13 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.evlikat.siberian.model.Direction.*;
-import static net.evlikat.siberian.model.Position.on;
-import static org.junit.Assert.assertEquals;
+import static net.evlikat.siberian.geo.Direction.EAST;
+import static net.evlikat.siberian.geo.Direction.NORTH;
+import static net.evlikat.siberian.geo.Direction.SOUTH;
+import static net.evlikat.siberian.geo.Position.on;
+import static org.junit.Assert.*;
 
 public class PositionTest {
 
-    public static final List<Direction> ALL = Arrays.asList(values());
+    public static final List<Direction> ALL = Arrays.asList(Direction.values());
 
     @Test
     public void shouldProperlyCalculateNextPositionInDirectionToTarget() throws Exception {

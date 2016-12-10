@@ -1,4 +1,4 @@
-package net.evlikat.siberian.model;
+package net.evlikat.siberian.geo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
