@@ -47,7 +47,11 @@ public class WolfDrawer implements Drawer<Wolf> {
         g.setColor(bySex(wolf.sex()));
         g.fillRect(xPadding, yPadding, (int) ((size - 2) * wolf.health().part()), 2);
 
-        wolf.pregnancy().ifPresent(gauge -> g.fillRect(1, SIZE - FETUS_SIZE, FETUS_SIZE - 2, FETUS_SIZE - 2));
+        wolf.pregnancy().ifPresent(gauge -> g.fillRect(
+                1,
+                (int) g.getClipBounds().getHeight() - FETUS_SIZE,
+                FETUS_SIZE - 2,
+                FETUS_SIZE - 2));
     }
 
     private Color bySex(Sex sex) {

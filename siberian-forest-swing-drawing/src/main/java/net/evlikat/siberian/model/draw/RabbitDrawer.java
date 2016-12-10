@@ -48,7 +48,11 @@ public class RabbitDrawer implements Drawer<Rabbit> {
         g.fillRect(xPadding, yPadding, (int) ((size - 2) * rabbit.health().part()), 2);
 
         rabbit.pregnancy()
-                .ifPresent(gauge -> g.fillRect(size - FETUS_SIZE, 0, FETUS_SIZE - 2, FETUS_SIZE - 2));
+                .ifPresent(gauge -> g.fillRect(
+                        1,
+                        (int) g.getClipBounds().getHeight() - FETUS_SIZE,
+                        FETUS_SIZE - 2,
+                        FETUS_SIZE - 2));
     }
 
     private Color bySex(Sex sex) {
