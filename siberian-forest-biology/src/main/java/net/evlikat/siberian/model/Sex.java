@@ -1,22 +1,16 @@
 package net.evlikat.siberian.model;
 
-import java.awt.Color;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Sex {
-    public static final Sex MALE = new Sex("male", Color.ORANGE);
-    public static final Sex FEMALE = new Sex("female", Color.BLUE);
+
+    public static final Sex MALE = new Sex("male");
+    public static final Sex FEMALE = new Sex("female");
 
     private final String name;
-    private final Color color;
 
-    private Sex(String name, Color color) {
+    private Sex(String name) {
         this.name = name;
-        this.color = color;
-    }
-
-    public Color getColor() {
-        return color;
     }
 
     public static Sex random() {

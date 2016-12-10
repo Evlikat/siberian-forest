@@ -2,6 +2,7 @@ package net.evlikat.siberian.model.draw;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.model.Cell;
 
 import java.awt.Color;
@@ -9,10 +10,10 @@ import java.awt.Graphics2D;
 
 public class CellDrawer implements Drawer<Cell> {
 
-    protected static final Config CONF = ConfigFactory.load().getConfig("cell");
+    private static final Config CONF = Configuration.ROOT.getConfig("cell");
 
     public static final int SIZE = CONF.getInt("draw.size");
-    static final Color BORDER = Color.LIGHT_GRAY;
+    private static final Color BORDER = Color.LIGHT_GRAY;
 
     private final GrassDrawer grassDrawer = new GrassDrawer();
 

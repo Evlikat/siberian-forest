@@ -15,4 +15,8 @@ public final class ColorUtils {
 
         return new Color(red, green, blue, alpha);
     }
+
+    public static Color parse(String rgbHex) {
+        return new Color(Integer.parseInt(rgbHex, 16));
+    }
 }

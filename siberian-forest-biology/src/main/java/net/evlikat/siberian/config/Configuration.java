@@ -32,6 +32,6 @@ public final class Configuration {
                             return null;
                     }
                 }
-        ).map(cnf -> cnf.withFallback(ConfigFactory.load())).orElseGet(ConfigFactory::load);
+        ).map(cnf -> cnf.withFallback(ConfigFactory.parseResources("application.conf"))).orElseGet(ConfigFactory::load);
     }
 }

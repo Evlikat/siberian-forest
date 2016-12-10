@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.awt.RenderingHints.*;
+
 public class FieldVisualizationPanel extends JPanel {
 
     private static final Config CONF = Configuration.ROOT.getConfig("field");
@@ -83,9 +85,9 @@ public class FieldVisualizationPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(KEY_ALPHA_INTERPOLATION, VALUE_ALPHA_INTERPOLATION_QUALITY);
         paintField(g2d);
     }
 

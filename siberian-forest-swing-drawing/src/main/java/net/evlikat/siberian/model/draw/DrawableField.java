@@ -32,7 +32,7 @@ public class DrawableField implements Drawable {
     private List<DrawableRabbit> drawableRabbits = new ArrayList<>();
     private List<DrawableWolf> drawableWolves = new ArrayList<>();
 
-    public DrawableField(Field field, DrawableZooFactory drawableZooFactory, List<DrawableCell> drawableCells) {
+    private DrawableField(Field field, DrawableZooFactory drawableZooFactory, List<DrawableCell> drawableCells) {
         this.field = field;
         this.drawableZooFactory = drawableZooFactory;
         this.drawableCells = drawableCells;
