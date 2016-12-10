@@ -1,15 +1,12 @@
 package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
-import net.evlikat.siberian.model.draw.Drawable;
 import net.evlikat.siberian.model.stats.NumberGauge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,7 +16,7 @@ public abstract class Wolf extends LivingUnit<Wolf> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Wolf.class);
 
-    protected static final Config CONF = ConfigFactory.load().getConfig("wolf");
+    protected static final Config CONF =  Configuration.ROOT.getConfig("wolf");
 
     protected static final int SIGHT = CONF.getInt("sight");
     protected static final int SPEED = CONF.getInt("speed");

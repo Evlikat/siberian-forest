@@ -2,6 +2,7 @@ package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.model.draw.Drawable;
 import net.evlikat.siberian.model.stats.NumberGauge;
@@ -13,7 +14,7 @@ import static net.evlikat.siberian.utils.ColorUtils.modify;
 
 public class Grass implements Food, Drawable {
 
-    protected static final Config CONF = ConfigFactory.load().getConfig("grass");
+    protected static final Config CONF = Configuration.ROOT.getConfig("grass");
 
     private static final int FOOD_VALUE = CONF.getInt("foodValue");
     private static final int MAX = CONF.getInt("max");

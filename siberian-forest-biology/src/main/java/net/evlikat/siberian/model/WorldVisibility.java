@@ -21,10 +21,6 @@ public class WorldVisibility implements Visibility {
         this.cells = cells;
     }
 
-    public static WorldVisibility no() {
-        return new WorldVisibility(0, 0, Collections.emptyList(), Collections.emptyList());
-    }
-
     @Override
     public int getWidth() {
         return width;

@@ -50,8 +50,8 @@ public class RegularRabbit extends Rabbit {
                         Map.Entry::getKey, e -> e.getValue().stream().mapToInt(VALUE_MAP::get).sum(),
                         Integer::sum, HashMap::new));
 
-        Map<Position, Integer> predatorValueMap = updatePropagatingValues(visibility, PREDATOR, positionValues);
-        Map<Position, Integer> competitorValueMap = updatePropagatingValues(visibility, COMPETITOR, positionValues);
+        Map<Position, Integer> predatorValueMap = updateProliferatingValues(visibility, PREDATOR, positionValues);
+        Map<Position, Integer> competitorValueMap = updateProliferatingValues(visibility, COMPETITOR, positionValues);
 
         Integer foodCellValue = VALUE_MAP.get(FOOD);
         Map<Position, Integer> cellValues = visibility.cells()
@@ -71,8 +71,8 @@ public class RegularRabbit extends Rabbit {
                 });
     }
 
-    private Map<Position, Integer> updatePropagatingValues(Visibility visibility, RegularRabbitTargetAttitude key,
-                                                           Map<Position, Set<RegularRabbitTargetAttitude>> positionValues) {
+    private Map<Position, Integer> updateProliferatingValues(Visibility visibility, RegularRabbitTargetAttitude key,
+                                                             Map<Position, Set<RegularRabbitTargetAttitude>> positionValues) {
         List<Position> negativePositions = positionValues.entrySet().stream()
                 .filter(e -> e.getValue().contains(key))
                 .map(Map.Entry::getKey)

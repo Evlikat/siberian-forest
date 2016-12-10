@@ -1,15 +1,15 @@
 package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RegularZooFactory implements ZooFactory {
 
-    private static final Config RABBIT_CONF = ConfigFactory.load().getConfig("rabbit");
-    private static final Config WOLF_CONF = ConfigFactory.load().getConfig("wolf");
+    private static final Config RABBIT_CONF =  Configuration.ROOT.getConfig("rabbit");
+    private static final Config WOLF_CONF =  Configuration.ROOT.getConfig("wolf");
 
     public static final int RABBIT_MAX_AGE = RABBIT_CONF.getInt("maxAge");
     public static final int WOLF_MAX_AGE = WOLF_CONF.getInt("maxAge");

@@ -1,19 +1,11 @@
 package net.evlikat.siberian.swing;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.model.Field;
-import net.evlikat.siberian.model.Rabbit;
-import net.evlikat.siberian.model.RegularZooFactory;
-import net.evlikat.siberian.model.ScentStorage;
 import net.evlikat.siberian.model.UpdateResult;
-import net.evlikat.siberian.model.Wolf;
 import net.evlikat.siberian.model.draw.CellDrawer;
-import net.evlikat.siberian.model.draw.DrawableLivingUnit;
-import net.evlikat.siberian.model.draw.RabbitDrawer;
-import net.evlikat.siberian.model.draw.WolfDrawer;
-import net.evlikat.siberian.model.draw.factory.DrawableZooFactory;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,7 +23,7 @@ import java.util.stream.IntStream;
 
 public class FieldVisualizationPanel extends JPanel {
 
-    private static final Config CONF = ConfigFactory.load().getConfig("field");
+    private static final Config CONF = Configuration.ROOT.getConfig("field");
 
     public static final int WIDTH = CONF.getInt("width");
     public static final int HEIGHT = CONF.getInt("height");
@@ -102,7 +94,11 @@ public class FieldVisualizationPanel extends JPanel {
         UpdateResult result = field.update();
         repaint();
         if (infoConsumer != null) {
-            infoConsumer.accept("Units: " + result.getUnitsTotal() + ", Elapsed: " + result.getElapsed() + "ms");
+            infoConsumer.accept(
+                    "Rabbits: " + result.getRabbitsTotal()
+                            + ", Wolves: " + result.getWolvesTotal()
+                            + ", Elapsed: "
+                            + result.getElapsed() + "ms");
         }
     }
 

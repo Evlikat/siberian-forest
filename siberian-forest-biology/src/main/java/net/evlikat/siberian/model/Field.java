@@ -3,12 +3,8 @@ package net.evlikat.siberian.model;
 import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.geo.Sized;
 import net.evlikat.siberian.model.draw.DrawableCell;
-import net.evlikat.siberian.model.draw.DrawableLivingUnit;
 import net.evlikat.siberian.model.draw.DrawableRabbit;
 import net.evlikat.siberian.model.draw.DrawableWolf;
-import net.evlikat.siberian.model.draw.Drawer;
-import net.evlikat.siberian.model.draw.RabbitDrawer;
-import net.evlikat.siberian.model.draw.WolfDrawer;
 import net.evlikat.siberian.model.draw.factory.CellFactory;
 import net.evlikat.siberian.model.draw.factory.DrawableZooFactory;
 import org.slf4j.Logger;
@@ -88,7 +84,7 @@ public class Field implements ScentStorage, Sized {
         justBornWolves.clear();
 
         long end = System.currentTimeMillis();
-        return new UpdateResult(end - st, rabbits.size());
+        return new UpdateResult(end - st, rabbits.size(), wolves.size());
     }
 
     private void cellTurn(Cell cell) {
@@ -103,7 +99,7 @@ public class Field implements ScentStorage, Sized {
         return new WorldVisibility(
                 getWidth(),
                 getHeight(),
-                rabbits.keySet().stream()
+                Stream.concat(rabbits.keySet().stream(), wolves.keySet().stream())
                         .filter(u -> u != unit)
                         .filter(u -> u.getPosition().distance(unit.getPosition()) <= unit.getSight())
                         .collect(Collectors.toList()),
@@ -122,15 +118,12 @@ public class Field implements ScentStorage, Sized {
                 SIZE - 1)
         ));
 
-
-        Map<Position, List<Map.Entry<? extends LivingUnit, ? extends DrawableLivingUnit<? extends LivingUnit, ? extends Drawer<? extends LivingUnit>>>>>
-                unitsByPosition = Stream.concat(
+        Stream.concat(
                 new LinkedHashMap<>(rabbits).entrySet().stream(),
                 new LinkedHashMap<>(wolves).entrySet().stream()
         ).collect(
                 Collectors.groupingBy(du -> du.getKey().getPosition())
-        );
-        unitsByPosition.forEach((position, units) -> {
+        ).forEach((position, units) -> {
                     units.stream().filter(u -> u.getKey() instanceof Wolf).findAny().ifPresent(unit ->
                             unit.getValue().draw((Graphics2D) g.create(
                                     position.getX() * SIZE,

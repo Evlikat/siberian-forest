@@ -1,7 +1,7 @@
 package net.evlikat.siberian.model;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.model.stats.NumberGauge;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ public abstract class Rabbit extends LivingUnit<Rabbit> implements Food {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Rabbit.class);
 
-    private static final Config CONF = ConfigFactory.load().getConfig("rabbit");
+    private static final Config CONF =  Configuration.ROOT.getConfig("rabbit");
 
     private static final int MAX_AGE = CONF.getInt("maxAge");
     private static final int ADULT = CONF.getInt("adult");

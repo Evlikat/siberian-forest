@@ -3,19 +3,25 @@ package net.evlikat.siberian.model;
 public class UpdateResult {
 
     private final long elapsed;
-    private final int unitsTotal;
+    private final int rabbitsTotal;
+    private final int wolvesTotal;
 
-    public UpdateResult(long elapsed, int unitsTotal) {
+    public UpdateResult(long elapsed, int rabbitsTotal, int wolvesTotal) {
 
         this.elapsed = elapsed;
-        this.unitsTotal = unitsTotal;
+        this.rabbitsTotal = rabbitsTotal;
+        this.wolvesTotal = wolvesTotal;
     }
 
     public long getElapsed() {
         return elapsed;
     }
 
-    public int getUnitsTotal() {
-        return unitsTotal;
+    public int getRabbitsTotal() {
+        return rabbitsTotal;
+    }
+
+    public int getWolvesTotal() {
+        return wolvesTotal;
     }
 }
