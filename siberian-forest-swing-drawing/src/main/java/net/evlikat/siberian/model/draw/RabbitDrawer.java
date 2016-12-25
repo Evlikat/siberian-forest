@@ -45,7 +45,7 @@ public class RabbitDrawer implements Drawer<Rabbit> {
         g.drawImage(IMG, xPadding, yPadding, size - 2, size - 2, null);
 
         g.setColor(bySex(rabbit.sex()));
-        g.fillRect(xPadding, yPadding, (int) ((size - 2) * rabbit.health().part()), 2);
+        g.fillRect(1, 1, (int) ((g.getClipBounds().getWidth() - 1) * rabbit.health().part()), 2);
 
         rabbit.pregnancy()
                 .ifPresent(gauge -> g.fillRect(

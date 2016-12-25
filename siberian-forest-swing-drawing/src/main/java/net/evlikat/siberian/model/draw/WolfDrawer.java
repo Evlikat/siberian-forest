@@ -45,7 +45,7 @@ public class WolfDrawer implements Drawer<Wolf> {
         g.drawImage(IMG, xPadding, yPadding, size - 2, size - 2, null);
 
         g.setColor(bySex(wolf.sex()));
-        g.fillRect(xPadding, yPadding, (int) ((size - 2) * wolf.health().part()), 2);
+        g.fillRect(1, 1, (int) ((g.getClipBounds().getWidth() - 1) * wolf.health().part()), 2);
 
         wolf.pregnancy().ifPresent(gauge -> g.fillRect(
                 1,

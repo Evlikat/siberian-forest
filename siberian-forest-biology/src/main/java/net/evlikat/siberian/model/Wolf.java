@@ -64,7 +64,6 @@ public abstract class Wolf extends LivingUnit<Wolf> {
             if (p.incAndWhelp(g -> {
                 do {
                     birth(newWolf());
-                    health.minus(50);
                     LOGGER.debug("A new wolf was born on {}", getPosition());
                 } while (ThreadLocalRandom.current().nextDouble() < BIRTH_RATE);
             })) {
