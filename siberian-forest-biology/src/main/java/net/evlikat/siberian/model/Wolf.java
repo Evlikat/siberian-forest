@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Wolf extends LivingUnit<Wolf> {
+public final class Wolf extends LivingUnit<Wolf> implements WolfInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Wolf.class);
 
@@ -27,22 +27,36 @@ public abstract class Wolf extends LivingUnit<Wolf> {
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
+    private final AI<WolfInfo> ai;
 
-    public Wolf(Position position, int age, Sex sex, ScentStorage scentStorage) {
+    public Wolf(AI<WolfInfo> ai, Position position, int age, Sex sex, ScentStorage scentStorage) {
         super(SIGHT, new NumberGauge(age, 0, MAX_AGE), SPEED, position, Collections.singletonList(Rabbit.class), scentStorage);
+        this.ai = ai;
         this.sex = sex;
     }
 
+    @Override
     public Optional<Pregnancy> pregnancy() {
         return pregnancy;
     }
 
+    @Override
     public Sex sex() {
         return sex;
     }
 
     @Override
-    protected void multiply(Visibility visibility) {
+    protected Optional<Position> move(Visibility visibility) {
+        return ai.move(this, visibility);
+    }
+
+    @Override
+    protected Optional<Food> feed(Visibility visibility) {
+        return ai.feed(this, visibility);
+    }
+
+    @Override
+    protected void breed(Visibility visibility) {
         if (this.sex != Sex.FEMALE || !adult() || pregnancy().isPresent()) {
             return;
         }
@@ -77,7 +91,9 @@ public abstract class Wolf extends LivingUnit<Wolf> {
         // I don't smell
     }
 
-    protected abstract Wolf newWolf();
+    private Wolf newWolf() {
+        return new Wolf(ai, getPosition(), 0, Sex.random(), getScentStorage());
+    }
 
     @Override
     public String toString() {

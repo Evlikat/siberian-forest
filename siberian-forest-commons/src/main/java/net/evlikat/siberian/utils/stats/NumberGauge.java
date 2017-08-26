@@ -1,6 +1,6 @@
 package net.evlikat.siberian.utils.stats;
 
-public class NumberGauge extends Gauge<Integer> {
+public class NumberGauge extends Gauge<Integer> implements NumberGaugeInfo {
 
     public NumberGauge(Integer current, Integer min, Integer max) {
         super(current, min, max);
@@ -10,6 +10,7 @@ public class NumberGauge extends Gauge<Integer> {
         super(max, min, max);
     }
 
+    @Override
     public float part() {
         return getCurrent().floatValue() / getMax().floatValue();
     }

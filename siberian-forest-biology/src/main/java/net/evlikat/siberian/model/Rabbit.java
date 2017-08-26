@@ -12,11 +12,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Rabbit extends LivingUnit<Rabbit> implements Food {
+public final class Rabbit extends LivingUnit<Rabbit> implements Food, RabbitInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Rabbit.class);
 
-    private static final Config CONF =  Configuration.ROOT.getConfig("rabbit");
+    private static final Config CONF = Configuration.ROOT.getConfig("rabbit");
 
     private static final int MAX_AGE = CONF.getInt("maxAge");
     private static final int ADULT = CONF.getInt("adult");
@@ -27,16 +27,30 @@ public abstract class Rabbit extends LivingUnit<Rabbit> implements Food {
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
+    private final AI<RabbitInfo> ai;
 
-    public Rabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
+    public Rabbit(AI<RabbitInfo> ai, Position position, int age, Sex sex, ScentStorage scentStorage) {
         super(3, new NumberGauge(age, 0, MAX_AGE), SPEED, position, Collections.emptyList(), scentStorage);
+        this.ai = ai;
         this.sex = sex;
     }
 
+    @Override
+    protected Optional<Position> move(Visibility visibility) {
+        return ai.move(this, visibility);
+    }
+
+    @Override
+    protected Optional<Food> feed(Visibility visibility) {
+        return ai.feed(this, visibility);
+    }
+
+    @Override
     public Optional<Pregnancy> pregnancy() {
         return pregnancy;
     }
 
+    @Override
     public Sex sex() {
         return sex;
     }
@@ -52,23 +66,25 @@ public abstract class Rabbit extends LivingUnit<Rabbit> implements Food {
     }
 
     @Override
-    protected void multiply(Visibility visibility) {
+    protected void breed(Visibility visibility) {
         if (this.sex != Sex.FEMALE || !adult() || pregnancy().isPresent()) {
             return;
         }
         visibility.units()
-                .map(unit -> unit instanceof Rabbit ? (Rabbit) unit : null)
-                .filter(Objects::nonNull)
-                .filter(otherRabbit -> otherRabbit.sex != this.sex && otherRabbit.adult())
-                .findAny()
-                .ifPresent(mate -> pregnancy = Optional.of(new Pregnancy(PREGNANCY_TIME)));
+            .map(unit -> unit instanceof Rabbit ? (Rabbit) unit : null)
+            .filter(Objects::nonNull)
+            .filter(otherRabbit -> otherRabbit.sex != this.sex && otherRabbit.adult())
+            .findAny()
+            .ifPresent(mate -> pregnancy = Optional.of(new Pregnancy(PREGNANCY_TIME)));
     }
 
     public boolean adult() {
         return age.getCurrent() >= ADULT;
     }
 
-    protected abstract Rabbit newRabbit();
+    private Rabbit newRabbit() {
+        return new Rabbit(ai, getPosition(), 0, Sex.random(), getScentStorage());
+    }
 
     protected void updateGauges() {
         health.minus(1);
@@ -88,11 +104,11 @@ public abstract class Rabbit extends LivingUnit<Rabbit> implements Food {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                "age=" + age +
-                ", health=" + health +
-                ", sex=" + sex +
-                ", pregnant=" + pregnancy().map(Object::toString).orElse("none") +
-                ", position=" + getPosition() +
-                '}';
+            "age=" + age +
+            ", health=" + health +
+            ", sex=" + sex +
+            ", pregnant=" + pregnancy().map(Object::toString).orElse("none") +
+            ", position=" + getPosition() +
+            '}';
     }
 }

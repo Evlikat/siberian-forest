@@ -11,10 +11,10 @@ public class WorldVisibility implements Visibility {
 
     private final int width;
     private final int height;
-    private final Collection<LivingUnit> units;
+    private final Collection<? extends LivingUnitInfo> units;
     private final Collection<Cell> cells;
 
-    public WorldVisibility(int width, int height, Collection<LivingUnit> units, Collection<Cell> cells) {
+    public WorldVisibility(int width, int height, Collection<? extends LivingUnitInfo> units, Collection<Cell> cells) {
         this.width = width;
         this.height = height;
         this.units = units;
@@ -32,7 +32,7 @@ public class WorldVisibility implements Visibility {
     }
 
     @Override
-    public Stream<LivingUnit> units() {
+    public Stream<? extends LivingUnitInfo> units() {
         return units.stream();
     }
 

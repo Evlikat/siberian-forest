@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-public abstract class LivingUnit<T extends LivingUnit<T>> {
+public abstract class LivingUnit<T extends LivingUnit<T>> implements LivingUnitInfo {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(LivingUnit.class);
 
@@ -80,7 +80,7 @@ public abstract class LivingUnit<T extends LivingUnit<T>> {
             }
         });
         if (health.part() > 0.5d) {
-            multiply(localVisibility);
+            breed(localVisibility);
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class LivingUnit<T extends LivingUnit<T>> {
 
     protected abstract Optional<Food> feed(Visibility visibility);
 
-    protected abstract void multiply(Visibility visibility);
+    protected abstract void breed(Visibility visibility);
 
     private void updateUnitState() {
         if (!alive) {

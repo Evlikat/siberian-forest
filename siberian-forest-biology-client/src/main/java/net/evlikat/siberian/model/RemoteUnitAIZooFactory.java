@@ -6,7 +6,7 @@ import net.evlikat.siberian.geo.Position;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RegularZooFactory implements ZooFactory {
+public class RemoteUnitAIZooFactory implements ZooFactory {
 
     private static final Config RABBIT_CONF =  Configuration.ROOT.getConfig("rabbit");
     private static final Config WOLF_CONF =  Configuration.ROOT.getConfig("wolf");
@@ -16,12 +16,12 @@ public class RegularZooFactory implements ZooFactory {
 
     @Override
     public Rabbit createRabbit(Position position, ScentStorage scentStorage) {
-        return new Rabbit(new RegularRabbitAI(), position, randomAge(RABBIT_MAX_AGE), Sex.random(), scentStorage);
+        return new Rabbit(new RemoteRabbitAI(), position, randomAge(RABBIT_MAX_AGE), Sex.random(), scentStorage);
     }
 
     @Override
     public Wolf createWolf(Position position, ScentStorage scentStorage) {
-        return new Wolf(new RegularWolfAI(), position, randomAge(WOLF_MAX_AGE), Sex.random(), scentStorage);
+        return new Wolf(new RemoteWolfAI(), position, randomAge(WOLF_MAX_AGE), Sex.random(), scentStorage);
     }
 
     private int randomAge(int max) {

@@ -29,6 +29,7 @@
         <module>siberian-forest-biology-impl</module>
         <module>siberian-forest-geo</module>
         <module>siberian-forest-swing-drawing</module>
+        <module>siberian-forest-biology-client</module>
     </modules>
     <dependencies>
         <dependency>

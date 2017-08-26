@@ -11,7 +11,7 @@ public interface Visibility extends Sized {
 
     int getHeight();
 
-    Stream<LivingUnit> units();
+    Stream<? extends LivingUnitInfo> units();
 
     Stream<Cell> cells();
 

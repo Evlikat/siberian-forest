@@ -5,6 +5,7 @@ import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.utils.CollectionUtils;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,9 +22,10 @@ import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.FOOD;
 import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.MATE;
 import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.PREDATOR;
 
-public class RegularRabbit extends Rabbit {
+public class RegularRabbitAI implements AI<RabbitInfo> {
 
-    private static final Map<RegularRabbitTargetAttitude, Integer> VALUE_MAP = new EnumMap<>(RegularRabbitTargetAttitude.class);
+    private static final Map<RegularRabbitTargetAttitude, Integer> VALUE_MAP
+        = new EnumMap<>(RegularRabbitTargetAttitude.class);
 
     static {
         VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -20);
@@ -32,18 +34,13 @@ public class RegularRabbit extends Rabbit {
         VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 10);
     }
 
-    RegularRabbit(Position position, int age, Sex sex, ScentStorage scentStorage) {
-        super(position, age, sex, scentStorage);
+    private boolean wantsToEat(RabbitInfo me) {
+        return me.health().part() < 0.5d;
     }
 
     @Override
-    protected RegularRabbit newRabbit() {
-        return new RegularRabbit(getPosition(), 0, Sex.random(), getScentStorage());
-    }
-
-    @Override
-    public Optional<Position> move(Visibility visibility) {
-        Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = updateWithUnits(visibility.units());
+    public Optional<Position> move(RabbitInfo me, Visibility visibility) {
+        Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = updateWithUnits(me, visibility.units());
 
         HashMap<Position, Integer> positionValueMap = positionValues.entrySet().stream()
                 .collect(Collectors.toMap(
@@ -62,12 +59,12 @@ public class RegularRabbit extends Rabbit {
         Map<Position, Integer> totalValueMap = CollectionUtils.mergeMaps(
                 Integer::sum, predatorValueMap, competitorValueMap, positionValueMap, cellValues);
         return totalValueMap.entrySet().stream()
-                .max((e1, e2) -> Integer.compare(e1.getValue(), e2.getValue()))
+                .max(Comparator.comparingInt(Map.Entry::getValue))
                 .map(max -> {
                     List<Direction> availableDirections = Direction.shuffledValues()
-                            .filter(dir -> !getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
+                            .filter(dir -> !me.getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
                             .collect(Collectors.toList());
-                    return getPosition().inDirectionTo(max.getKey(), availableDirections);
+                    return me.getPosition().inDirectionTo(max.getKey(), availableDirections);
                 });
     }
 
@@ -91,56 +88,53 @@ public class RegularRabbit extends Rabbit {
                 .reduce((map1, map2) -> CollectionUtils.mergeMaps(Integer::sum, map1, map2)).orElse(Collections.emptyMap());
     }
 
-    private Map<Position, Set<RegularRabbitTargetAttitude>> updateWithUnits(Stream<LivingUnit> units) {
+    private Map<Position, Set<RegularRabbitTargetAttitude>> updateWithUnits(
+        RabbitInfo me,
+        Stream<? extends LivingUnitInfo> units
+    ) {
         Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = new HashMap<>();
-        Map<Position, List<LivingUnit>> positionUnits = units.collect(Collectors.groupingBy(LivingUnit::getPosition));
+        Map<Position, List<LivingUnitInfo>> positionUnits = units.collect(Collectors.groupingBy(LivingUnitInfo::getPosition));
 
-        positionUnits.entrySet()
-                .forEach(p -> p.getValue().stream()
-                        .map(InterestUnit::new)
-                        .forEach(iu -> {
-                            if (iu.asPredator != null) {
-                                positionValues.computeIfAbsent(p.getKey(), (pos) -> new HashSet<>()).add(PREDATOR);
-                            }
-                            if (iu.asMate != null) {
-                                RegularRabbitTargetAttitude attitude = goodPartner(iu.asMate) ? MATE : COMPETITOR;
-                                positionValues.computeIfAbsent(p.getKey(), (pos) -> new HashSet<>()).add(attitude);
-                            }
-                        })
-                );
+        positionUnits.forEach((key, value) -> value.stream()
+            .map(InterestUnit::new)
+            .forEach(iu -> {
+                if (iu.asPredator != null) {
+                    positionValues.computeIfAbsent(key, (pos) -> new HashSet<>()).add(PREDATOR);
+                }
+                if (iu.asMate != null) {
+                    RegularRabbitTargetAttitude attitude = goodPartner(me, iu.asMate) ? MATE : COMPETITOR;
+                    positionValues.computeIfAbsent(key, (pos) -> new HashSet<>()).add(attitude);
+                }
+            }));
 
         return positionValues;
     }
 
-    private boolean goodPartner(Rabbit candidate) {
+    private boolean goodPartner(RabbitInfo me, Rabbit candidate) {
         return candidate.adult()
-                && candidate.sex != this.sex
+                && candidate.sex != me.sex()
                 && !candidate.pregnancy().isPresent()
-                && !pregnancy().isPresent();
+                && !me.pregnancy().isPresent();
     }
 
     @Override
-    protected Optional<Food> feed(Visibility visibility) {
-        if (!wantsToEat()) {
+    public Optional<Food> feed(RabbitInfo me, Visibility visibility) {
+        if (!wantsToEat(me)) {
             return Optional.empty();
         }
         return visibility.cells()
-                .filter(c -> c.getPosition().equals(getPosition()))
+                .filter(c -> c.getPosition().equals(me.getPosition()))
                 .findAny()
                 .map(Cell::getGrass);
     }
 
-    private boolean wantsToEat() {
-        return health.part() < 0.5d;
-    }
-
     private static class InterestUnit {
 
-        final LivingUnit asUnit;
+        final LivingUnitInfo asUnit;
         final Rabbit asMate;
         final Wolf asPredator;
 
-        InterestUnit(LivingUnit unit) {
+        InterestUnit(LivingUnitInfo unit) {
             this.asUnit = unit;
             if (unit instanceof Rabbit) {
                 this.asMate = (Rabbit) unit;
