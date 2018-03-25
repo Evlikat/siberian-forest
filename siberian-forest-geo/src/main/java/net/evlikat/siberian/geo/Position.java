@@ -2,6 +2,7 @@ package net.evlikat.siberian.geo;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class Position {
     public Position inDirectionTo(Position to, List<Direction> availableDirections) {
         return availableDirections.stream()
                 .map(dir -> Pair.of(dir, to.distance(adjust(dir))))
-                .min((p1, p2) -> Integer.compare(p1.getValue(), p2.getValue()))
+                .min(Comparator.comparingInt(Pair::getValue))
                 .map(Pair::getKey)
                 .map(this::adjust)
                 .orElse(this);
@@ -59,7 +60,7 @@ public class Position {
     public Position awayFrom(Position to, List<Direction> availableDirections) {
         return availableDirections.stream()
                 .map(dir -> Pair.of(dir, to.distance(adjust(dir))))
-                .max((p1, p2) -> Integer.compare(p1.getValue(), p2.getValue()))
+                .max(Comparator.comparingInt(Pair::getValue))
                 .map(Pair::getKey)
                 .map(this::adjust)
                 .orElse(this);

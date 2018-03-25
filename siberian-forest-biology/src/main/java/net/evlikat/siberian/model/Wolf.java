@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,14 +17,14 @@ public final class Wolf extends LivingUnit<Wolf> implements WolfInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Wolf.class);
 
-    protected static final Config CONF =  Configuration.ROOT.getConfig("wolf");
+    private static final Config CONF = Configuration.ROOT.getConfig("wolf");
 
-    protected static final int SIGHT = CONF.getInt("sight");
-    protected static final int SPEED = CONF.getInt("speed");
-    protected static final int MAX_AGE = CONF.getInt("maxAge");
-    protected static final double BIRTH_RATE = CONF.getDouble("birthRate");
-    protected static final int ADULT = CONF.getInt("adult");
-    protected static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
+    private static final int SIGHT = CONF.getInt("sight");
+    private static final int SPEED = CONF.getInt("speed");
+    private static final int MAX_AGE = CONF.getInt("maxAge");
+    private static final double BIRTH_RATE = CONF.getDouble("birthRate");
+    private static final int ADULT = CONF.getInt("adult");
+    private static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
@@ -46,26 +47,31 @@ public final class Wolf extends LivingUnit<Wolf> implements WolfInfo {
     }
 
     @Override
-    protected Optional<Position> move(Visibility visibility) {
+    public List<Position> aim(Visibility visibility) {
+        return ai.aim(this, visibility);
+    }
+
+    @Override
+    public Optional<Position> move(Visibility visibility) {
         return ai.move(this, visibility);
     }
 
     @Override
-    protected Optional<Food> feed(Visibility visibility) {
+    public Optional<Food> feed(Visibility visibility) {
         return ai.feed(this, visibility);
     }
 
     @Override
-    protected void breed(Visibility visibility) {
+    public void breed(Visibility visibility) {
         if (this.sex != Sex.FEMALE || !adult() || pregnancy().isPresent()) {
             return;
         }
         visibility.units()
-                .map(unit -> unit instanceof Wolf ? (Wolf) unit : null)
-                .filter(Objects::nonNull)
-                .filter(otherWolf -> otherWolf.sex != this.sex && otherWolf.adult())
-                .findAny()
-                .ifPresent(mate -> pregnancy = Optional.of(new Pregnancy(PREGNANCY_TIME)));
+            .map(unit -> unit instanceof Wolf ? (Wolf) unit : null)
+            .filter(Objects::nonNull)
+            .filter(otherWolf -> otherWolf.sex != this.sex && otherWolf.adult())
+            .findAny()
+            .ifPresent(mate -> pregnancy = Optional.of(new Pregnancy(PREGNANCY_TIME)));
     }
 
     public final boolean adult() {
@@ -98,11 +104,11 @@ public final class Wolf extends LivingUnit<Wolf> implements WolfInfo {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                "age=" + age +
-                ", health=" + health +
-                ", sex=" + sex +
-                ", pregnant=" + pregnancy().map(Object::toString).orElse("none") +
-                ", position=" + getPosition() +
-                '}';
+            "age=" + age +
+            ", health=" + health +
+            ", sex=" + sex +
+            ", pregnant=" + pregnancy().map(Object::toString).orElse("none") +
+            ", position=" + getPosition() +
+            '}';
     }
 }

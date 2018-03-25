@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,12 +37,17 @@ public final class Rabbit extends LivingUnit<Rabbit> implements Food, RabbitInfo
     }
 
     @Override
-    protected Optional<Position> move(Visibility visibility) {
+    public List<Position> aim(Visibility visibility) {
+        return ai.aim(this, visibility);
+    }
+
+    @Override
+    public Optional<Position> move(Visibility visibility) {
         return ai.move(this, visibility);
     }
 
     @Override
-    protected Optional<Food> feed(Visibility visibility) {
+    public Optional<Food> feed(Visibility visibility) {
         return ai.feed(this, visibility);
     }
 
@@ -66,7 +72,7 @@ public final class Rabbit extends LivingUnit<Rabbit> implements Food, RabbitInfo
     }
 
     @Override
-    protected void breed(Visibility visibility) {
+    public void breed(Visibility visibility) {
         if (this.sex != Sex.FEMALE || !adult() || pregnancy().isPresent()) {
             return;
         }

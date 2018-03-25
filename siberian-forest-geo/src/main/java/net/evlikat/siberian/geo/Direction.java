@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.stream;
+
 public enum Direction {
 
     NO(Position.on(0, 0)),
@@ -19,12 +21,20 @@ public enum Direction {
         this.delta = delta;
     }
 
+    private static Direction byRelativePosition(Position pos) {
+        return stream(values()).filter(d -> d.delta.equals(pos)).findFirst().orElseThrow(IllegalArgumentException::new);
+    }
+
     public int deltaX() {
         return delta.getX();
     }
 
     public int deltaY() {
         return delta.getY();
+    }
+
+    public Direction opposite() {
+        return byRelativePosition(Position.on(-this.delta.getX(), -this.delta.getY()));
     }
 
     public static Stream<Direction> shuffledValues() {

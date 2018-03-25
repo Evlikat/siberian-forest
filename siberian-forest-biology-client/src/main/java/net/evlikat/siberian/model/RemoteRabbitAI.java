@@ -8,11 +8,11 @@ public class RemoteRabbitAI implements AI<RabbitInfo> {
 
     @Override
     public Optional<Position> move(RabbitInfo unit, Visibility visibility) {
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<Food> feed(RabbitInfo unit, Visibility visibility) {
-        return null;
+        return Optional.empty();
     }
 }

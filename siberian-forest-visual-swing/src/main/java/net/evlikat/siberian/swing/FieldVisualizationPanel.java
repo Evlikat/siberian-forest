@@ -3,20 +3,14 @@ package net.evlikat.siberian.swing;
 import com.typesafe.config.Config;
 import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
-import net.evlikat.siberian.model.Field;
 import net.evlikat.siberian.model.UpdateResult;
 import net.evlikat.siberian.model.draw.CellDrawer;
 import net.evlikat.siberian.model.draw.DrawableField;
 import net.evlikat.siberian.model.draw.factory.CellFactory;
 import net.evlikat.siberian.model.draw.factory.GrassFactory;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,7 +18,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.awt.RenderingHints.*;
+import static java.awt.RenderingHints.KEY_ALPHA_INTERPOLATION;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_RENDERING;
+import static java.awt.RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_RENDER_QUALITY;
 
 public class FieldVisualizationPanel extends JPanel {
 
@@ -100,10 +99,10 @@ public class FieldVisualizationPanel extends JPanel {
         repaint();
         if (infoConsumer != null) {
             infoConsumer.accept(
-                    "Rabbits: " + result.getRabbitsTotal()
-                            + ", Wolves: " + result.getWolvesTotal()
-                            + ", Elapsed: "
-                            + result.getElapsed() + "ms");
+                "Rabbits: " + result.getRabbitsTotal()
+                    + ", Wolves: " + result.getWolvesTotal()
+                    + ", Elapsed: "
+                    + result.getElapsed() + "ms");
         }
     }
 
@@ -121,11 +120,16 @@ public class FieldVisualizationPanel extends JPanel {
         }
     }
 
+    public void highlightAim(Point point) {
+        field.highlightAim(field.unitsOn(positionBy(point)).findFirst().orElse(null));
+        repaint();
+    }
+
     public void showInfoAbout(Point point) {
         Position position = positionBy(point);
         JOptionPane.showMessageDialog(null, field.unitsOn(position)
-                .map(Object::toString)
-                .collect(Collectors.joining(",\n")));
+            .map(Object::toString)
+            .collect(Collectors.joining(",\n")));
     }
 
     private Position positionBy(Point point) {

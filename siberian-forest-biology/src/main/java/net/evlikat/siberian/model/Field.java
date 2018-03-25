@@ -91,7 +91,7 @@ public class Field implements ScentStorage, Sized {
         cellOn(position).updateScent();
     }
 
-    private Cell cellOn(Position position) {
+    public Cell cellOn(Position position) {
         return cells.get(position.getY() * width + position.getX());
     }
 

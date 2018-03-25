@@ -88,11 +88,13 @@ public abstract class LivingUnit<T extends LivingUnit<T>> implements LivingUnitI
         scentStorage.update(getPosition());
     }
 
-    protected abstract Optional<Position> move(Visibility visibility);
+    public abstract List<Position> aim(Visibility visibility);
 
-    protected abstract Optional<Food> feed(Visibility visibility);
+    public abstract Optional<Position> move(Visibility visibility);
 
-    protected abstract void breed(Visibility visibility);
+    public abstract Optional<Food> feed(Visibility visibility);
+
+    public abstract void breed(Visibility visibility);
 
     private void updateUnitState() {
         if (!alive) {

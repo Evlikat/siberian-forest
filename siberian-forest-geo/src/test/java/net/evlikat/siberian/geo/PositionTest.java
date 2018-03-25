@@ -45,11 +45,13 @@ public class PositionTest {
         Set<Position> aroundPositions = center.around(2, new SimpleSized(100, 100));
 
         assertEquals(new HashSet<>(Arrays.asList(
-                on(2, 0),
-                on(1, 1), on(3, 1), on(2, 1),
-                on(0, 2), on(1, 2), on(2, 2), on(3, 2), on(4, 2),
-                on(1, 3), on(2, 3), on(3, 3),
-                on(2, 4)
+            //@formatter:off
+                                on(2, 0),
+                      on(1, 1), on(2, 1), on(3, 1),
+            on(0, 2), on(1, 2), on(2, 2), on(3, 2), on(4, 2),
+                      on(1, 3), on(2, 3), on(3, 3),
+                                on(2, 4)
+            //@formatter:on
         )), aroundPositions);
     }
 

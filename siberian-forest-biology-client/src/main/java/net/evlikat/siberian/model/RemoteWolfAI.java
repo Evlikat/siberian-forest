@@ -8,11 +8,11 @@ public class RemoteWolfAI implements AI<WolfInfo> {
 
     @Override
     public Optional<Position> move(WolfInfo unit, Visibility visibility) {
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<Food> feed(WolfInfo unit, Visibility visibility) {
-        return null;
+        return Optional.empty();
     }
 }

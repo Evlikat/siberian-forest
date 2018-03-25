@@ -5,7 +5,6 @@ import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.utils.CollectionUtils;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +21,7 @@ import java.util.stream.Stream;
 import static net.evlikat.siberian.model.RegularWolfTargetAttitude.COMPETITOR;
 import static net.evlikat.siberian.model.RegularWolfTargetAttitude.FOOD;
 import static net.evlikat.siberian.model.RegularWolfTargetAttitude.MATE;
+import static net.evlikat.siberian.utils.CollectionUtils.best;
 
 public class RegularWolfAI implements AI<WolfInfo> {
 
@@ -55,7 +55,7 @@ public class RegularWolfAI implements AI<WolfInfo> {
     }
 
     @Override
-    public Optional<Position> move(WolfInfo me, Visibility visibility) {
+    public List<Position> aim(WolfInfo me, Visibility visibility) {
         Map<Position, Set<RegularWolfTargetAttitude>> positionValues = updateWithUnits(me, visibility.units());
         Map<Position, Integer> cellValues = updateWithCells(visibility.cells());
 
@@ -65,14 +65,18 @@ public class RegularWolfAI implements AI<WolfInfo> {
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 .mapToInt(attr -> VALUE_MAP.get(attr).apply(this, me)).sum()));
         cellValues.forEach((key, value) -> positionValueMap.merge(key, value, Integer::sum));
+        List<Map.Entry<Position, Integer>> res = best(CollectionUtils.mergeMaps(Integer::sum, positionValueMap, competitorValueMap));
+        return res.stream().map(Map.Entry::getKey).collect(Collectors.toList());
+    }
 
-        return CollectionUtils.mergeMaps(Integer::sum, positionValueMap, competitorValueMap).entrySet().stream()
-            .max(Comparator.comparingInt(Map.Entry::getValue))
-            .map(max -> {
+    @Override
+    public Optional<Position> move(WolfInfo me, Visibility visibility) {
+        return aim(me, visibility).stream().findFirst()
+            .map(bestPos -> {
                 List<Direction> availableDirections = Direction.shuffledValues()
                     .filter(dir -> !me.getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
                     .collect(Collectors.toList());
-                return me.getPosition().inDirectionTo(max.getKey(), availableDirections);
+                return me.getPosition().inDirectionTo(bestPos, availableDirections);
             });
     }
 

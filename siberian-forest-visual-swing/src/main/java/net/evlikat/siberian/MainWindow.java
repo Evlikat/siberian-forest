@@ -3,14 +3,11 @@ package net.evlikat.siberian;
 import net.evlikat.siberian.swing.FieldVisualizationPanel;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -72,7 +69,7 @@ public class MainWindow extends JFrame {
     }
 
     private void initMouseListener(FieldVisualizationPanel panel) {
-        panel.addMouseListener(new MouseAdapter() {
+        MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -83,7 +80,14 @@ public class MainWindow extends JFrame {
                     panel.showInfoAbout(e.getPoint());
                 }
             }
-        });
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                fieldPanel.highlightAim(e.getPoint());
+            }
+        };
+        panel.addMouseListener(mouseAdapter);
+        panel.addMouseMotionListener(mouseAdapter);
     }
 
     private GridBagConstraints gbc(int x, int y) {

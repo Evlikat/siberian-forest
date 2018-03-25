@@ -5,7 +5,6 @@ import net.evlikat.siberian.geo.Position;
 import net.evlikat.siberian.utils.CollectionUtils;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +20,7 @@ import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.COMPETITOR;
 import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.FOOD;
 import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.MATE;
 import static net.evlikat.siberian.model.RegularRabbitTargetAttitude.PREDATOR;
+import static net.evlikat.siberian.utils.CollectionUtils.best;
 
 public class RegularRabbitAI implements AI<RabbitInfo> {
 
@@ -39,53 +39,59 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
     }
 
     @Override
-    public Optional<Position> move(RabbitInfo me, Visibility visibility) {
+    public List<Position> aim(RabbitInfo me, Visibility visibility) {
         Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = updateWithUnits(me, visibility.units());
 
         HashMap<Position, Integer> positionValueMap = positionValues.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, e -> e.getValue().stream().mapToInt(VALUE_MAP::get).sum(),
-                        Integer::sum, HashMap::new));
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, e -> e.getValue().stream().mapToInt(VALUE_MAP::get).sum(),
+                Integer::sum, HashMap::new));
 
         Map<Position, Integer> predatorValueMap = updateProliferatingValues(visibility, PREDATOR, positionValues);
         Map<Position, Integer> competitorValueMap = updateProliferatingValues(visibility, COMPETITOR, positionValues);
 
         Integer foodCellValue = VALUE_MAP.get(FOOD);
         Map<Position, Integer> cellValues = visibility.cells()
-                .collect(Collectors.toMap(
-                        Cell::getPosition,
-                        c -> c.getGrass().getFoodCurrent() >= c.getGrass().getFoodValue() ? foodCellValue: 0));
+            .collect(Collectors.toMap(
+                Cell::getPosition,
+                c -> c.getGrass().getFoodCurrent() >= c.getGrass().getFoodValue() ? foodCellValue : 0));
 
         Map<Position, Integer> totalValueMap = CollectionUtils.mergeMaps(
-                Integer::sum, predatorValueMap, competitorValueMap, positionValueMap, cellValues);
-        return totalValueMap.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
-                .map(max -> {
-                    List<Direction> availableDirections = Direction.shuffledValues()
-                            .filter(dir -> !me.getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
-                            .collect(Collectors.toList());
-                    return me.getPosition().inDirectionTo(max.getKey(), availableDirections);
-                });
+            Integer::sum, predatorValueMap, competitorValueMap, positionValueMap, cellValues);
+        List<Map.Entry<Position, Integer>> res = best(totalValueMap);
+        return res.stream().map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Position> move(RabbitInfo me, Visibility visibility) {
+        List<Position> positions = aim(me, visibility);
+        return positions.stream().findFirst()
+            .map(bestPos -> {
+                List<Direction> availableDirections = Direction.shuffledValues()
+                    .filter(dir -> !me.getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
+                    .collect(Collectors.toList());
+                return me.getPosition().inDirectionTo(bestPos, availableDirections);
+            });
     }
 
     private Map<Position, Integer> updateProliferatingValues(Visibility visibility, RegularRabbitTargetAttitude key,
                                                              Map<Position, Set<RegularRabbitTargetAttitude>> positionValues) {
         List<Position> negativePositions = positionValues.entrySet().stream()
-                .filter(e -> e.getValue().contains(key))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+            .filter(e -> e.getValue().contains(key))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
 
         Integer epicenterValue = VALUE_MAP.get(key);
 
         return negativePositions.stream()
-                .map(position ->
-                        (Map<Position, Integer>) visibility.cells()
-                                .map(Cell::getPosition)
-                                .collect(Collectors.toMap(
-                                        Function.identity(),
-                                        pos -> epicenterValue + position.distance(pos),
-                                        Integer::sum, HashMap::new)))
-                .reduce((map1, map2) -> CollectionUtils.mergeMaps(Integer::sum, map1, map2)).orElse(Collections.emptyMap());
+            .map(position ->
+                (Map<Position, Integer>) visibility.cells()
+                    .map(Cell::getPosition)
+                    .collect(Collectors.toMap(
+                        Function.identity(),
+                        pos -> epicenterValue + position.distance(pos),
+                        Integer::sum, HashMap::new)))
+            .reduce((map1, map2) -> CollectionUtils.mergeMaps(Integer::sum, map1, map2)).orElse(Collections.emptyMap());
     }
 
     private Map<Position, Set<RegularRabbitTargetAttitude>> updateWithUnits(
@@ -112,9 +118,9 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
 
     private boolean goodPartner(RabbitInfo me, Rabbit candidate) {
         return candidate.adult()
-                && candidate.sex != me.sex()
-                && !candidate.pregnancy().isPresent()
-                && !me.pregnancy().isPresent();
+            && candidate.sex != me.sex()
+            && !candidate.pregnancy().isPresent()
+            && !me.pregnancy().isPresent();
     }
 
     @Override
@@ -123,9 +129,9 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
             return Optional.empty();
         }
         return visibility.cells()
-                .filter(c -> c.getPosition().equals(me.getPosition()))
-                .findAny()
-                .map(Cell::getGrass);
+            .filter(c -> c.getPosition().equals(me.getPosition()))
+            .findAny()
+            .map(Cell::getGrass);
     }
 
     private static class InterestUnit {
