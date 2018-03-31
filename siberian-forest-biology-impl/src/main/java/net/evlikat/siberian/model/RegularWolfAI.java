@@ -30,8 +30,8 @@ public class RegularWolfAI implements AI<WolfInfo> {
 
     static {
         VALUE_MAP.put(RegularWolfTargetAttitude.COMPETITOR, (ai, me) -> -5);
-        VALUE_MAP.put(RegularWolfTargetAttitude.MATE, (ai, me) -> ai.wantsToMultiply(me) ? 15 : 0);
-        VALUE_MAP.put(RegularWolfTargetAttitude.FOOD, (ai, me) -> ai.wantsToEat(me) ? 10 : 0);
+        VALUE_MAP.put(RegularWolfTargetAttitude.MATE, (ai, me) -> ai.wantsToMultiply(me) ? 20 : 0);
+        VALUE_MAP.put(RegularWolfTargetAttitude.FOOD, (ai, me) -> ai.wantsToEat(me) ? 50 : 0);
     }
 
     @Override

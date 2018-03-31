@@ -19,12 +19,12 @@ public final class Rabbit extends LivingUnit<Rabbit> implements Food, RabbitInfo
 
     private static final Config CONF = Configuration.ROOT.getConfig("rabbit");
 
-    private static final int MAX_AGE = CONF.getInt("maxAge");
-    private static final int ADULT = CONF.getInt("adult");
-    private static final int SPEED = CONF.getInt("speed");
-    private static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
-    private static final int BIRTH_RATE = CONF.getInt("birthRate");
-    private static final int FOOD_VALUE = CONF.getInt("foodValue");
+    public static final int MAX_AGE = CONF.getInt("maxAge");
+    public static final int ADULT = CONF.getInt("adult");
+    public static final int SPEED = CONF.getInt("speed");
+    public static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
+    public static final int BIRTH_RATE = CONF.getInt("birthRate");
+    public static final int FOOD_VALUE = CONF.getInt("foodValue");
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();

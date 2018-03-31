@@ -28,10 +28,10 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
         = new EnumMap<>(RegularRabbitTargetAttitude.class);
 
     static {
-        VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -20);
+        VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -50);
         VALUE_MAP.put(RegularRabbitTargetAttitude.COMPETITOR, -5);
         VALUE_MAP.put(RegularRabbitTargetAttitude.MATE, 10);
-        VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 10);
+        VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 30);
     }
 
     private boolean wantsToEat(RabbitInfo me) {

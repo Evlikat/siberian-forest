@@ -15,12 +15,12 @@ public class RemoteUnitAIZooFactory implements ZooFactory {
     public static final int WOLF_MAX_AGE = WOLF_CONF.getInt("maxAge");
 
     @Override
-    public Rabbit createRabbit(Position position, ScentStorage scentStorage) {
+    public Rabbit createRabbit(Position position, RabbitExample example, ScentStorage scentStorage) {
         return new Rabbit(new RemoteRabbitAI(), position, randomAge(RABBIT_MAX_AGE), Sex.random(), scentStorage);
     }
 
     @Override
-    public Wolf createWolf(Position position, ScentStorage scentStorage) {
+    public Wolf createWolf(Position position, WolfExample wolfExample, ScentStorage scentStorage) {
         return new Wolf(new RemoteWolfAI(), position, randomAge(WOLF_MAX_AGE), Sex.random(), scentStorage);
     }
 

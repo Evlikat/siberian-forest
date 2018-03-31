@@ -19,12 +19,12 @@ public final class Wolf extends LivingUnit<Wolf> implements WolfInfo {
 
     private static final Config CONF = Configuration.ROOT.getConfig("wolf");
 
-    private static final int SIGHT = CONF.getInt("sight");
-    private static final int SPEED = CONF.getInt("speed");
-    private static final int MAX_AGE = CONF.getInt("maxAge");
-    private static final double BIRTH_RATE = CONF.getDouble("birthRate");
-    private static final int ADULT = CONF.getInt("adult");
-    private static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
+    public static final int SIGHT = CONF.getInt("sight");
+    public static final int SPEED = CONF.getInt("speed");
+    public static final int MAX_AGE = CONF.getInt("maxAge");
+    public static final double BIRTH_RATE = CONF.getDouble("birthRate");
+    public static final int ADULT = CONF.getInt("adult");
+    public static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();

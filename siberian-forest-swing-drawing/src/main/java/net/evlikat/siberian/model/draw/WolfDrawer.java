@@ -24,7 +24,7 @@ public class WolfDrawer implements Drawer<Wolf> {
     private static final Color MALE_COLOR = ColorUtils.parse(CONF.getString("male.color"));
     private static final Color FEMALE_COLOR = ColorUtils.parse(CONF.getString("female.color"));
 
-    private static BufferedImage IMG;
+    public static BufferedImage IMG;
 
     static {
         try {

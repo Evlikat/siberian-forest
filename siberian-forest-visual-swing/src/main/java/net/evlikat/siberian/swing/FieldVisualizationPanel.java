@@ -3,7 +3,9 @@ package net.evlikat.siberian.swing;
 import com.typesafe.config.Config;
 import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.geo.Position;
+import net.evlikat.siberian.model.RabbitExample;
 import net.evlikat.siberian.model.UpdateResult;
+import net.evlikat.siberian.model.WolfExample;
 import net.evlikat.siberian.model.draw.CellDrawer;
 import net.evlikat.siberian.model.draw.DrawableField;
 import net.evlikat.siberian.model.draw.factory.CellFactory;
@@ -47,12 +49,12 @@ public class FieldVisualizationPanel extends JPanel {
         IntStream.range(0, CONF.getInt("rabbits")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addRabbitOn(Position.on(randX, randY));
+            field.addRabbitOn(Position.on(randX, randY), RabbitExample.random());
         });
         IntStream.range(0, CONF.getInt("wolves")).forEach(i -> {
             int randX = ThreadLocalRandom.current().nextInt(WIDTH);
             int randY = ThreadLocalRandom.current().nextInt(HEIGHT);
-            field.addWolfOn(Position.on(randX, randY));
+            field.addWolfOn(Position.on(randX, randY), WolfExample.random());
         });
         repaint();
     }
@@ -106,16 +108,16 @@ public class FieldVisualizationPanel extends JPanel {
         }
     }
 
-    public void putWolfOn(Point point) {
+    public void putWolfOn(Point point, WolfExample example) {
         if (timer == null) {
-            field.addRabbitOn(positionBy(point));
+            field.addWolfOn(positionBy(point), example);
             repaint();
         }
     }
 
-    public void putRabbitOn(Point point) {
+    public void putRabbitOn(Point point, RabbitExample example) {
         if (timer == null) {
-            field.addWolfOn(positionBy(point));
+            field.addRabbitOn(positionBy(point), example);
             repaint();
         }
     }

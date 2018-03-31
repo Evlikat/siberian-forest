@@ -1,5 +1,12 @@
 package net.evlikat.siberian;
 
+import net.evlikat.siberian.model.Rabbit;
+import net.evlikat.siberian.model.RabbitExample;
+import net.evlikat.siberian.model.Sex;
+import net.evlikat.siberian.model.Wolf;
+import net.evlikat.siberian.model.WolfExample;
+import net.evlikat.siberian.model.draw.RabbitDrawer;
+import net.evlikat.siberian.model.draw.WolfDrawer;
 import net.evlikat.siberian.swing.FieldVisualizationPanel;
 
 import javax.swing.*;
@@ -16,9 +23,15 @@ public class MainWindow extends JFrame {
     private JLabel infoLabel;
     private JPanel rootPanel;
     private JPanel managementPanel;
+    private JPanel creaturePanel;
     private JButton restartButton;
     private JButton stopStartButton;
     private JButton updateButton;
+    private ButtonGroup bGroup;
+    private JToggleButton femaleRabbitLabel;
+    private JToggleButton maleRabbitLabel;
+    private JToggleButton femaleWolfLabel;
+    private JToggleButton maleWolfLabel;
     private FieldVisualizationPanel fieldPanel;
 
     public MainWindow() throws HeadlessException {
@@ -54,11 +67,28 @@ public class MainWindow extends JFrame {
         fieldPanel.init();
         initMouseListener(fieldPanel);
 
+        creaturePanel = new JPanel();
+        creaturePanel.setLayout(new GridBagLayout());
+        femaleRabbitLabel = styled(new JToggleButton("F", new ImageIcon(RabbitDrawer.IMG)));
+        maleRabbitLabel = styled(new JToggleButton("M", new ImageIcon(RabbitDrawer.IMG)));
+        femaleWolfLabel = styled(new JToggleButton("F", new ImageIcon(WolfDrawer.IMG)));
+        maleWolfLabel = styled(new JToggleButton("M", new ImageIcon(WolfDrawer.IMG)));
+        bGroup = new ButtonGroup();
+        bGroup.add(femaleRabbitLabel);
+        bGroup.add(maleRabbitLabel);
+        bGroup.add(femaleWolfLabel);
+        bGroup.add(maleWolfLabel);
+        creaturePanel.add(femaleRabbitLabel, gbc(0, 0));
+        creaturePanel.add(maleRabbitLabel, gbc(1, 0));
+        creaturePanel.add(femaleWolfLabel, gbc(2, 0));
+        creaturePanel.add(maleWolfLabel, gbc(3, 0));
+
         infoLabel = new JLabel("Info");
         infoLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
         rootPanel.add(managementPanel, BorderLayout.CENTER);
         rootPanel.add(fieldPanel, BorderLayout.CENTER);
+        rootPanel.add(creaturePanel, BorderLayout.CENTER);
         rootPanel.add(infoLabel, BorderLayout.EAST);
 
         setContentPane(rootPanel);
@@ -72,11 +102,20 @@ public class MainWindow extends JFrame {
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    panel.putWolfOn(e.getPoint());
-                } else if (SwingUtilities.isLeftMouseButton(e)) {
-                    panel.putRabbitOn(e.getPoint());
-                } else {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    if (femaleRabbitLabel.isSelected()) {
+                        panel.putRabbitOn(e.getPoint(), new RabbitExample(Rabbit.ADULT, Sex.FEMALE));
+                    } else if (maleRabbitLabel.isSelected()) {
+                        panel.putRabbitOn(e.getPoint(), new RabbitExample(Rabbit.ADULT, Sex.MALE));
+                    } else if (femaleWolfLabel.isSelected()) {
+                        panel.putWolfOn(e.getPoint(), new WolfExample(Wolf.ADULT, Sex.MALE));
+                    } else if (maleWolfLabel.isSelected()) {
+                        panel.putWolfOn(e.getPoint(), new WolfExample(Wolf.ADULT, Sex.MALE));
+                    }
+                    if (!e.isShiftDown()) {
+                        bGroup.clearSelection();
+                    }
+                } else if (SwingUtilities.isRightMouseButton(e)) {
                     panel.showInfoAbout(e.getPoint());
                 }
             }
@@ -101,7 +140,7 @@ public class MainWindow extends JFrame {
         return gbc;
     }
 
-    private JButton styled(JButton button) {
+    private <T extends AbstractButton> T styled(T button) {
         button.setForeground(Color.BLACK);
         button.setBackground(Color.WHITE);
         Border line = new LineBorder(Color.BLACK);

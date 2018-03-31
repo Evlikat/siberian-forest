@@ -5,8 +5,10 @@ import net.evlikat.siberian.model.Cell;
 import net.evlikat.siberian.model.Field;
 import net.evlikat.siberian.model.LivingUnit;
 import net.evlikat.siberian.model.Rabbit;
+import net.evlikat.siberian.model.RabbitExample;
 import net.evlikat.siberian.model.UpdateResult;
 import net.evlikat.siberian.model.Wolf;
+import net.evlikat.siberian.model.WolfExample;
 import net.evlikat.siberian.model.draw.factory.CellFactory;
 import net.evlikat.siberian.model.draw.factory.DrawableZooFactory;
 import net.evlikat.siberian.model.draw.factory.GrassFactory;
@@ -111,14 +113,14 @@ public class DrawableField implements Drawable {
         );
     }
 
-    public void addRabbitOn(Position position) {
-        DrawableRabbit drawable = drawableZooFactory.createRabbit(position, field);
+    public void addRabbitOn(Position position, RabbitExample example) {
+        DrawableRabbit drawable = drawableZooFactory.createRabbit(position, example, field);
         field.addRabbit(drawable.getRabbit());
         drawableRabbits.add(drawable);
     }
 
-    public void addWolfOn(Position position) {
-        DrawableWolf drawable = drawableZooFactory.createWolf(position, field);
+    public void addWolfOn(Position position, WolfExample example) {
+        DrawableWolf drawable = drawableZooFactory.createWolf(position, example, field);
         field.addWolf(drawable.getWolf());
         drawableWolves.add(drawable);
     }
