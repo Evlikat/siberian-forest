@@ -25,13 +25,14 @@ public final class Rabbit extends LivingUnit<Rabbit> implements Food, RabbitInfo
     public static final int PREGNANCY_TIME = CONF.getInt("pregnancyTime");
     public static final int BIRTH_RATE = CONF.getInt("birthRate");
     public static final int FOOD_VALUE = CONF.getInt("foodValue");
+    public static final int SIGHT = CONF.getInt("sight");
 
     protected final Sex sex;
     private Optional<Pregnancy> pregnancy = Optional.empty();
     private final AI<RabbitInfo> ai;
 
     public Rabbit(AI<RabbitInfo> ai, Position position, int age, Sex sex, ScentStorage scentStorage) {
-        super(3, new NumberGauge(age, 0, MAX_AGE), SPEED, position, Collections.emptyList(), scentStorage);
+        super(SIGHT, new NumberGauge(age, 0, MAX_AGE), SPEED, position, Collections.emptyList(), scentStorage);
         this.ai = ai;
         this.sex = sex;
     }

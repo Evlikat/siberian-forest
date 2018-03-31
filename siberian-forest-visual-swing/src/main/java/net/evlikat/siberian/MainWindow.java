@@ -108,7 +108,7 @@ public class MainWindow extends JFrame {
                     } else if (maleRabbitLabel.isSelected()) {
                         panel.putRabbitOn(e.getPoint(), new RabbitExample(Rabbit.ADULT, Sex.MALE));
                     } else if (femaleWolfLabel.isSelected()) {
-                        panel.putWolfOn(e.getPoint(), new WolfExample(Wolf.ADULT, Sex.MALE));
+                        panel.putWolfOn(e.getPoint(), new WolfExample(Wolf.ADULT, Sex.FEMALE));
                     } else if (maleWolfLabel.isSelected()) {
                         panel.putWolfOn(e.getPoint(), new WolfExample(Wolf.ADULT, Sex.MALE));
                     }
