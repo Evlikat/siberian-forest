@@ -134,17 +134,19 @@ public class DrawableField implements Drawable {
     }
 
     public void highlightAim(LivingUnit<?> livingUnit) {
-        highlightedCells.forEach(c -> c.setHighlighted(false));
+        highlightedCells.forEach(c -> c.setValue(null));
         highlightedCells.clear();
         if (livingUnit == null) {
             return;
         }
-        livingUnit.aim(field.visibilityFor(livingUnit))
-            .stream()
-            .map(this::drawableCellOn)
-            .forEach(c -> {
-                c.setHighlighted(true);
-                highlightedCells.add(c);
+        Map<Position, Integer> evaluated = livingUnit.evaluate(field.visibilityFor(livingUnit));
+        int min = evaluated.values().stream().mapToInt(i -> i).min().orElse(0);
+        int max = evaluated.values().stream().mapToInt(i -> i).max().orElse(0);
+        evaluated
+            .forEach((position, value) -> {
+                DrawableCell dc = drawableCellOn(position);
+                dc.setValue(min == max ? 1 : ((float) value - min) / (max - min));
+                highlightedCells.add(dc);
             });
     }
 }

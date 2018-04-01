@@ -25,13 +25,19 @@ import static net.evlikat.siberian.utils.CollectionUtils.best;
 
 public class RegularWolfAI implements AI<WolfInfo> {
 
-    private static final Map<RegularWolfTargetAttitude, BiFunction<RegularWolfAI, WolfInfo, Integer>> VALUE_MAP
+    private static final Map<RegularWolfTargetAttitude, BiFunction<RegularWolfAI, WolfInfo, Integer>> ADULT_VALUE_MAP
+        = new EnumMap<>(RegularWolfTargetAttitude.class);
+    private static final Map<RegularWolfTargetAttitude, BiFunction<RegularWolfAI, WolfInfo, Integer>> BABY_VALUE_MAP
         = new EnumMap<>(RegularWolfTargetAttitude.class);
 
     static {
-        VALUE_MAP.put(RegularWolfTargetAttitude.COMPETITOR, (ai, me) -> -5);
-        VALUE_MAP.put(RegularWolfTargetAttitude.MATE, (ai, me) -> ai.wantsToMultiply(me) ? 20 : 0);
-        VALUE_MAP.put(RegularWolfTargetAttitude.FOOD, (ai, me) -> ai.wantsToEat(me) ? 50 : 0);
+        ADULT_VALUE_MAP.put(RegularWolfTargetAttitude.COMPETITOR, (ai, me) -> -5);
+        ADULT_VALUE_MAP.put(RegularWolfTargetAttitude.MATE, (ai, me) -> ai.wantsToMultiply(me) ? 20 : 0);
+        ADULT_VALUE_MAP.put(RegularWolfTargetAttitude.FOOD, (ai, me) -> ai.wantsToEat(me) ? 50 : 0);
+
+        BABY_VALUE_MAP.put(RegularWolfTargetAttitude.COMPETITOR, (ai, me) -> 0);
+        BABY_VALUE_MAP.put(RegularWolfTargetAttitude.MATE, (ai, me) -> 0);
+        BABY_VALUE_MAP.put(RegularWolfTargetAttitude.FOOD, (ai, me) -> ai.wantsToEat(me) ? 50 : 0);
     }
 
     @Override
@@ -55,7 +61,9 @@ public class RegularWolfAI implements AI<WolfInfo> {
     }
 
     @Override
-    public List<Position> aim(WolfInfo me, Visibility visibility) {
+    public Map<Position, Integer> evaluate(WolfInfo me, Visibility visibility) {
+        Map<RegularWolfTargetAttitude, BiFunction<RegularWolfAI, WolfInfo, Integer>> valueMap
+            = me.adult() ? ADULT_VALUE_MAP : BABY_VALUE_MAP;
         Map<Position, Set<RegularWolfTargetAttitude>> positionValues = updateWithUnits(me, visibility.units());
         Map<Position, Integer> cellValues = updateWithCells(visibility.cells());
 
@@ -63,21 +71,29 @@ public class RegularWolfAI implements AI<WolfInfo> {
 
         Map<Position, Integer> positionValueMap = positionValues.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                .mapToInt(attr -> VALUE_MAP.get(attr).apply(this, me)).sum()));
+                .mapToInt(attr -> {
+                    return valueMap.get(attr).apply(this, me);
+                }).sum()));
         cellValues.forEach((key, value) -> positionValueMap.merge(key, value, Integer::sum));
-        List<Map.Entry<Position, Integer>> res = best(CollectionUtils.mergeMaps(Integer::sum, positionValueMap, competitorValueMap));
-        return res.stream().map(Map.Entry::getKey).collect(Collectors.toList());
+        return CollectionUtils.mergeMaps(Integer::sum, positionValueMap, competitorValueMap);
     }
+
 
     @Override
     public Optional<Position> move(WolfInfo me, Visibility visibility) {
-        return aim(me, visibility).stream().findFirst()
+        return bestPositions(me, visibility).stream().findFirst()
             .map(bestPos -> {
                 List<Direction> availableDirections = Direction.shuffledValues()
                     .filter(dir -> !me.getPosition().by(dir).adjustableIn(0, 0, visibility.getWidth(), visibility.getHeight()))
                     .collect(Collectors.toList());
                 return me.getPosition().inDirectionTo(bestPos, availableDirections);
             });
+    }
+
+    private List<Position> bestPositions(WolfInfo me, Visibility visibility) {
+        Map<Position, Integer> totalValueMap = evaluate(me, visibility);
+        List<Map.Entry<Position, Integer>> res = best(totalValueMap);
+        return res.stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     private Map<Position, Set<RegularWolfTargetAttitude>> updateWithUnits(WolfInfo me, Stream<? extends LivingUnitInfo> units) {
@@ -110,7 +126,7 @@ public class RegularWolfAI implements AI<WolfInfo> {
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
 
-        Integer epicenterValue = VALUE_MAP.get(key).apply(this, me);
+        Integer epicenterValue = ADULT_VALUE_MAP.get(key).apply(this, me);
 
         return negativePositions.stream()
             .map(position ->

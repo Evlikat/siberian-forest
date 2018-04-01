@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,8 +38,8 @@ public final class Rabbit extends LivingUnit<Rabbit> implements Food, RabbitInfo
     }
 
     @Override
-    public List<Position> aim(Visibility visibility) {
-        return ai.aim(this, visibility);
+    public Map<Position, Integer> evaluate(Visibility visibility) {
+        return ai.evaluate(this, visibility);
     }
 
     @Override

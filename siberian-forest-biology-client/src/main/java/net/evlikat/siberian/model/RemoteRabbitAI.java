@@ -3,14 +3,14 @@ package net.evlikat.siberian.model;
 import net.evlikat.siberian.geo.Position;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RemoteRabbitAI implements AI<RabbitInfo> {
 
     @Override
-    public List<Position> aim(RabbitInfo unit, Visibility visibility) {
-        return Collections.emptyList();
+    public Map<Position, Integer> evaluate(RabbitInfo unit, Visibility visibility) {
+        return Collections.emptyMap();
     }
 
     @Override

@@ -24,14 +24,22 @@ import static net.evlikat.siberian.utils.CollectionUtils.best;
 
 public class RegularRabbitAI implements AI<RabbitInfo> {
 
-    private static final Map<RegularRabbitTargetAttitude, Integer> VALUE_MAP
+    private static final Map<RegularRabbitTargetAttitude, Integer> ADULT_VALUE_MAP
+        = new EnumMap<>(RegularRabbitTargetAttitude.class);
+
+    private static final Map<RegularRabbitTargetAttitude, Integer> BABY_VALUE_MAP
         = new EnumMap<>(RegularRabbitTargetAttitude.class);
 
     static {
-        VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -50);
-        VALUE_MAP.put(RegularRabbitTargetAttitude.COMPETITOR, -5);
-        VALUE_MAP.put(RegularRabbitTargetAttitude.MATE, 10);
-        VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 30);
+        ADULT_VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -50);
+        ADULT_VALUE_MAP.put(RegularRabbitTargetAttitude.COMPETITOR, -5);
+        ADULT_VALUE_MAP.put(RegularRabbitTargetAttitude.MATE, 10);
+        ADULT_VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 30);
+
+        BABY_VALUE_MAP.put(RegularRabbitTargetAttitude.PREDATOR, -50);
+        BABY_VALUE_MAP.put(RegularRabbitTargetAttitude.COMPETITOR, 0);
+        BABY_VALUE_MAP.put(RegularRabbitTargetAttitude.MATE, 0);
+        BABY_VALUE_MAP.put(RegularRabbitTargetAttitude.FOOD, 30);
     }
 
     private boolean wantsToEat(RabbitInfo me) {
@@ -39,32 +47,31 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
     }
 
     @Override
-    public List<Position> aim(RabbitInfo me, Visibility visibility) {
-        Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = updateWithUnits(me, visibility.units());
+    public Map<Position, Integer> evaluate(RabbitInfo me, Visibility visibility) {
+        Map<RegularRabbitTargetAttitude, Integer> valueMap = me.adult() ? ADULT_VALUE_MAP : BABY_VALUE_MAP;
 
+        Map<Position, Set<RegularRabbitTargetAttitude>> positionValues = updateWithUnits(me, visibility.units());
         HashMap<Position, Integer> positionValueMap = positionValues.entrySet().stream()
             .collect(Collectors.toMap(
-                Map.Entry::getKey, e -> e.getValue().stream().mapToInt(VALUE_MAP::get).sum(),
+                Map.Entry::getKey, e -> e.getValue().stream().mapToInt(valueMap::get).sum(),
                 Integer::sum, HashMap::new));
 
         Map<Position, Integer> predatorValueMap = updateProliferatingValues(visibility, PREDATOR, positionValues);
         Map<Position, Integer> competitorValueMap = updateProliferatingValues(visibility, COMPETITOR, positionValues);
 
-        Integer foodCellValue = VALUE_MAP.get(FOOD);
+        Integer foodCellValue = valueMap.get(FOOD);
         Map<Position, Integer> cellValues = visibility.cells()
             .collect(Collectors.toMap(
                 Cell::getPosition,
                 c -> c.getGrass().getFoodCurrent() >= c.getGrass().getFoodValue() ? foodCellValue : 0));
 
-        Map<Position, Integer> totalValueMap = CollectionUtils.mergeMaps(
+        return CollectionUtils.mergeMaps(
             Integer::sum, predatorValueMap, competitorValueMap, positionValueMap, cellValues);
-        List<Map.Entry<Position, Integer>> res = best(totalValueMap);
-        return res.stream().map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     @Override
     public Optional<Position> move(RabbitInfo me, Visibility visibility) {
-        List<Position> positions = aim(me, visibility);
+        List<Position> positions = bestPositions(me, visibility);
         return positions.stream().findFirst()
             .map(bestPos -> {
                 List<Direction> availableDirections = Direction.shuffledValues()
@@ -74,6 +81,12 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
             });
     }
 
+    private List<Position> bestPositions(RabbitInfo me, Visibility visibility) {
+        Map<Position, Integer> totalValueMap = evaluate(me, visibility);
+        List<Map.Entry<Position, Integer>> res = best(totalValueMap);
+        return res.stream().map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
     private Map<Position, Integer> updateProliferatingValues(Visibility visibility, RegularRabbitTargetAttitude key,
                                                              Map<Position, Set<RegularRabbitTargetAttitude>> positionValues) {
         List<Position> negativePositions = positionValues.entrySet().stream()
@@ -81,7 +94,7 @@ public class RegularRabbitAI implements AI<RabbitInfo> {
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
 
-        Integer epicenterValue = VALUE_MAP.get(key);
+        Integer epicenterValue = ADULT_VALUE_MAP.get(key);
 
         return negativePositions.stream()
             .map(position ->

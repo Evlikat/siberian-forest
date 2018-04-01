@@ -16,6 +16,30 @@ public final class ColorUtils {
         return new Color(red, green, blue, alpha);
     }
 
+    public static Color between(Color leftColor, Color rightColor, float fraction) {
+        int red = between(leftColor.getRed(), rightColor.getRed(), fraction);
+        int green = between(leftColor.getGreen(), rightColor.getGreen(), fraction);
+        int blue = between(leftColor.getBlue(), rightColor.getBlue(), fraction);
+        int alpha = between(leftColor.getAlpha(), rightColor.getAlpha(), fraction);
+
+        return new Color(red, green, blue, alpha);
+    }
+
+    private static int between(int left, int right, float fraction) {
+        int min;
+        int max;
+        if (left < right) {
+            min = left;
+            max = right;
+        } else if (right < left) {
+            min = left;
+            max = right;
+        } else {
+            return left;
+        }
+        return Math.round(min + fraction * (max - min));
+    }
+
     public static Color parse(String rgbHex) {
         return new Color(Integer.parseInt(rgbHex, 16));
     }

@@ -41,7 +41,7 @@ public class FieldVisualizationPanel extends JPanel {
 
     public FieldVisualizationPanel() {
         super(true);
-        setPreferredSize(new Dimension(CellDrawer.SIZE * WIDTH, CellDrawer.SIZE * HEIGHT));
+        setPreferredSize(new Dimension(CellDrawer.SIZE * WIDTH + 1, CellDrawer.SIZE * HEIGHT + 1));
     }
 
     public void init() {

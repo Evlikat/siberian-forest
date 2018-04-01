@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class DrawableCell extends DrawableObject<Cell, CellDrawer> {
 
-    private boolean isHighlighted = false;
+    private Float value;
     private HighlightedCellDrawer hDrawer;
 
     public DrawableCell(Cell object, CellDrawer drawer, HighlightedCellDrawer hDrawer) {
@@ -18,18 +18,18 @@ public class DrawableCell extends DrawableObject<Cell, CellDrawer> {
         return object;
     }
 
-    public boolean isHighlighted() {
-        return isHighlighted;
+    public Float getValue() {
+        return value;
     }
 
-    public void setHighlighted(boolean highlighted) {
-        isHighlighted = highlighted;
+    public void setValue(Float value) {
+        this.value = value;
     }
 
     @Override
     public void draw(Graphics2D g2d) {
-        if (isHighlighted) {
-            hDrawer.draw(this.object, g2d);
+        if (value != null) {
+            hDrawer.draw(this, g2d);
         } else {
             super.draw(g2d);
         }

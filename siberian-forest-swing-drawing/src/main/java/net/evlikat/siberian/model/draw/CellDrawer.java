@@ -1,12 +1,10 @@
 package net.evlikat.siberian.model.draw;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import net.evlikat.siberian.config.Configuration;
 import net.evlikat.siberian.model.Cell;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 
 public class CellDrawer implements Drawer<Cell> {
 

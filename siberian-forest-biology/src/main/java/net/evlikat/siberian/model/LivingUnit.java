@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -88,7 +89,7 @@ public abstract class LivingUnit<T extends LivingUnit<T>> implements LivingUnitI
         scentStorage.update(getPosition());
     }
 
-    public abstract List<Position> aim(Visibility visibility);
+    public abstract Map<Position, Integer> evaluate(Visibility visibility);
 
     public abstract Optional<Position> move(Visibility visibility);
 
